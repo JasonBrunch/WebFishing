@@ -1,4 +1,4 @@
-window.fishingRod = document.getElementById('fishing-rod');
+fishingRod = document.getElementById('fishing-rod');
 
 let startMouseX = 0;
 let startRotation = 0;
@@ -45,7 +45,7 @@ function HandleCast(totalRotation){
     let absoluteRotation = Math.abs(totalRotation);
     let scaledRotation = absoluteRotation / 100;
     let castPower = Math.min(scaledRotation, 100); //caps it to a maximum of 100
-    console.log(`Handle cast fired! Cast Power: ${castPower}`);
+    castLine(castPower);
 }
 
 // helper function to extract rotation angle from transform style
