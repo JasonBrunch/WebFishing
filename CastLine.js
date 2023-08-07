@@ -1,6 +1,7 @@
 
 let maxCastDistance = 500;
 let currentLine = null;
+let depth = 100;
 
 function castLine(castPower)
 {
@@ -11,7 +12,7 @@ function castLine(castPower)
     isReeledIn = false;
     let target = getTarget(castPower);
  
-    currentLine = drawLine(target); // Save the line globally after it's drawn
+    currentLine = drawLineWithHook(target); // Save the line globally after it's drawn
     
 
 }
@@ -27,33 +28,67 @@ function getTarget(castPower){
 
 }
 
-function drawLine(target)
-{
-    let svgNameSpace = "http://www.w3.org/2000/svg"; //namespace where svg elements are kept
+function drawLine(target) {  
+    let svgNameSpace = "http://www.w3.org/2000/svg";
 
-    //create new SVG element
+    // Create new SVG element
     let svg = document.createElementNS(svgNameSpace, "svg");
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", "100%");
     svg.style.position = "absolute";
     svg.style.top = 0;
     svg.style.left = 0;
-    svg.style.zIndex = 1; //Line appears infront of other elements
+    svg.style.zIndex = 1;
     svg.style.pointerEvents = "none";
-    //Create a new line element and set its attributes
-    let line = document.createElementNS(svgNameSpace, "line");
-    
 
-    line.setAttribute('x1', rodTipPosition.x);
-    line.setAttribute('y1', rodTipPosition.y);
-    line.setAttribute('x2', target.x);
-    line.setAttribute('y2', target.y);
-    line.setAttribute('stroke', 'black'); // set the color of the line
-    line.setAttribute('stroke-width', '2'); // set the thickness of the line
+    // Line from rod tip to target
+    let line1 = document.createElementNS(svgNameSpace, "line");
+    line1.setAttribute('x1', rodTipPosition.x);
+    line1.setAttribute('y1', rodTipPosition.y);
+    line1.setAttribute('x2', target.x);
+    line1.setAttribute('y2', target.y);
+    line1.setAttribute('stroke', 'black');
+    line1.setAttribute('stroke-width', '2');
 
-    //add the line to the SVG element container, and the svg element to the document body
-    svg.appendChild(line);
+    // Line going downwards from target
+    let line2 = document.createElementNS(svgNameSpace, "line");
+    line2.setAttribute('x1', target.x);
+    line2.setAttribute('y1', target.y);
+    line2.setAttribute('x2', target.x); // x remains the same because we're going vertically down
+    line2.setAttribute('y2', target.y + depth);  // add the depth to the y-coordinate
+    line2.setAttribute('stroke', 'black');
+    line2.setAttribute('stroke-width', '2');
+
+    // Add lines to the SVG element and SVG to the document body
+    svg.appendChild(line1);
+    svg.appendChild(line2);
     document.body.appendChild(svg);
 
     return svg;
 }
+function drawLineWithHook(target) { 
+    let svg = drawLine(target);  // assuming drawLine returns the SVG element as before
+
+    // Create hook element (as SVG path for simplicity)
+    let hook = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    hook.setAttribute('d', "M0 0 Q0 -5, 5 -5 T10 0");
+    hook.setAttribute('fill', 'none');
+    hook.setAttribute('stroke', 'black');
+    hook.setAttribute('stroke-width', '2');
+    
+    // Position the hook at the end of the vertical line and rotate it
+    let transform = `translate(${target.x}, ${target.y + depth}) rotate(90, 0, 0)`;
+    hook.setAttribute('transform', transform);
+
+    svg.appendChild(hook);
+
+    // Event listener to detect fish bite, or you could use a collision detection function in your game loop
+    hook.addEventListener('mouseover', function() {
+        console.log("Fish bite detected!");
+    });
+
+    return svg;  // Return the SVG container which now has both line and hook
+}
+
+
+
