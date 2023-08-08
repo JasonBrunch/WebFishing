@@ -82,10 +82,7 @@ function drawLineWithHook(target) {
 
     svg.appendChild(hook);
 
-    // Event listener to detect fish bite, or you could use a collision detection function in your game loop
-    hook.addEventListener('mouseover', function() {
-        console.log("Fish bite detected!");
-    });
+   
 
     return svg;  // Return the SVG container which now has both line and hook
 }

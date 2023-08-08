@@ -19,3 +19,24 @@ document.addEventListener('DOMContentLoaded', function() {
     createTipIndicator(rodTipPosition.x, rodTipPosition.y);
 });
 
+
+const testFishSpriteSheet = loadSpriteSheet("FishSpriteSheetTest.png");
+
+function loadSpriteSheet(src) {
+    const image = new Image();
+    image.src = src;
+    image.onload = () => {
+        console.log(`Sprite sheet ${src} loaded`);
+        let myFish = createFish('testFish', 100, 100);
+        drawFish(myFish);
+        console.log("FISH MADE");
+
+
+    };
+    return image;
+}
+
+//FISH TESTING AREA
+// Example of usage
+
+
