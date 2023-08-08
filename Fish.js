@@ -1,16 +1,15 @@
 class Fish {
-    constructor(type, x, y) {
-        this.spriteSheet = testFishSpriteSheet;
-        this.x = x;
-        this.y = y;
-        this.frameNumber = 1;
-        this.spriteWidth = 64;
-        this.spriteHeight = 64;
-        this.cols = 4;
+    constructor(type, x, y, speedX = 1, speedY = 1) { // You can set default values or pass them in when creating the fish
+      this.spriteSheet = testFishSpriteSheet;
+      this.x = x;
+      this.y = y;
+      this.frameNumber = 1;
+      this.spriteWidth = 64;
+      this.spriteHeight = 64;
+      this.cols = 4;
+      this.speedX = speedX; // Initialize speedX
+      this.speedY = speedY; // Initialize speedY
     }
-
-    
-
 
     draw(ctx) {
         
@@ -19,11 +18,7 @@ class Fish {
     
         let sourceX = col * this.spriteWidth; 
         let sourceY = row * this.spriteHeight;
-    
-        console.log(`Drawing sprite at: x=${this.x}, y=${this.y}`);
-        console.log(`Source: x=${sourceX}, y=${sourceY}`);
-        console.log(`Dimensions: width=${this.spriteWidth}, height=${this.spriteHeight}`);
-    
+
         ctx.drawImage(
             this.spriteSheet, 
             sourceX, sourceY, 
@@ -32,14 +27,12 @@ class Fish {
             this.spriteWidth, this.spriteHeight
         );
         
-       /*
-       ctx.drawImage(this.spriteSheet, this.x, this.y);
-
-       // Logging to help with debugging
-       console.log(`Drawing entire sprite sheet at: x=${this.x}, y=${this.y}`);
-        */
+     
 
     }
 
-    // Other fish-related methods can go here
-}
+    update() {
+        this.x += this.speedX; // Horizontal movement
+        this.y += this.speedY; // Vertical movement
+      }
+    }

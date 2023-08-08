@@ -30,6 +30,7 @@ function loadSpriteSheet(src) {
         let myFish = createFish('testFish', 100, 100);
         drawFish(myFish);
         console.log("FISH MADE");
+        fishes.push(myFish);
 
 
     };
