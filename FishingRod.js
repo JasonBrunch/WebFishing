@@ -51,7 +51,7 @@ function handleMouseMove(event) {
     /* adjust the rotation based on the mouse position */
     if(isCasting)
     {
-        console.log("MOVING MOUSE!");
+
         let mouseX = event.clientX; //get current mouse pos
         let diffX = startMouseX - mouseX; //calculates the difference
 

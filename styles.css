@@ -8,7 +8,6 @@ body, html {
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: aquamarine;
 }
 #button-area{
     background-color: lightgreen;
@@ -32,13 +31,6 @@ body, html {
     background-color: #2A7CA9; /* Even darker when clicked */
 }
 
-#water{
-    position: absolute;
-    bottom: 0;
-    background-color: lightblue;
-    width: 100%;
-    height: 50%;
-}
 
 #fishing-rod{
     position: absolute;
