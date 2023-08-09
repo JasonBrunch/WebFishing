@@ -32,19 +32,3 @@ body, html {
 }
 
 
-#fishing-rod{
-    position: absolute;
-    bottom: 0;
-    top: 50%;
-    left: 25%;
-    height: 0;
-    width: 0;
-    border: 1px solid black;
-    border-width: 0 0 3px 100px;
-    transform: rotate(-30deg); /* default position is straight up */
-    transform-origin: 0 100%; /* sets the origin of transformation to the bottom left corner */
-}
-#fish{
-    position:absolute;
-    z-index: 2;
-}
