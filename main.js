@@ -1,10 +1,4 @@
 
-//buttons
-document.getElementById('reel-button').addEventListener('click', function() {
-    console.log("CLICK CLICK");
-    // Your reeling in logic here
-    reelInLine();
-});
 
 
 
@@ -30,13 +24,12 @@ const config = {
   }
   
   function create() {
+    
+    
+    
     // Create objects, initialize variables, set up the game world
     this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
-    // Create an instance of the FishManager
-    this.fishManager = new FishManager(this);
-
-    // Create a fish using the FishManager
-    this.fishManager.createFish();
+   
     let rod = this.add.sprite(125,125,'fishingRod');
     
 
@@ -56,6 +49,13 @@ const config = {
         },
         // More methods as needed
     };
+      // Create an instance of the FishManager
+          this.fishManager = new FishManager(this, water);
+
+          // Create a fish using the FishManager
+          this.fishManager.createFish(10);
+
+
     
     // Draw the water
         water.draw();
@@ -79,6 +79,9 @@ const config = {
   
   function update() {
     // Update game logic, handle input, move characters, etc.
+    
+    //move fish:
+    this.fishManager.moveFish(); // Use 'this' to access the fishManager instance created in the create function
   }
   const game = new Phaser.Game(config);
 

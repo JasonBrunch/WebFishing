@@ -7,28 +7,7 @@ body, html {
 #game-area {
     position: relative;
     width: 100%;
-    height: 100%;
-}
-#button-area{
-    background-color: lightgreen;
-}
-#reel-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #2D9CDB; /* Nice blue shade */
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#reel-button:hover {
-    background-color: #2C8CBB; /* Slightly darker shade when hovered */
-}
-
-#reel-button:active {
-    background-color: #2A7CA9; /* Even darker when clicked */
+    height: 100vh; /* Sets the height to 100% of the viewport height */
 }
 
 
