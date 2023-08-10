@@ -49,6 +49,12 @@ const config = {
         },
         // More methods as needed
     };
+    this.anims.create({
+      key: 'swim',
+      frames: this.anims.generateFrameNumbers('fish', { start: 0, end: 2 }), // Assuming the first 3 frames (0, 1, 2) are your fish sprite animation
+      frameRate: 10, // Adjust this value to set the speed of the animation
+      repeat: -1 // -1 means the animation will repeat indefinitely
+    });
       // Create an instance of the FishManager
           this.fishManager = new FishManager(this, water);
 
@@ -71,7 +77,7 @@ const config = {
     // Update the boat guy's y-coordinate to the correct value
     boatGuy.setY(boatGuyY);
     
-
+    
     // ...
 }
 

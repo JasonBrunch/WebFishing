@@ -31,7 +31,7 @@ class FishManager {
         // Other methods related to fish, such as updating their positions, can be added here
 
     moveFish(){
-        
+
         this.fishes.forEach(fish =>fish.updateFish());
     }
  }
