@@ -15,6 +15,7 @@ const config = {
 };
 
 function preload() {
+
   // Load assets
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
   this.load.image('fishingRod','FishingRod.png');
@@ -23,9 +24,25 @@ function preload() {
   
 function create() {
   // Create objects, initialize variables, set up the game world
-  this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
-
+  //this.isCastable = true;
+  //this.lineCast = false;
   
+  this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
+  this.buttonShape = this.add.graphics({ fillStyle: { color: 0x00AA00 } }); // Change color as you wish
+
+  this.buttonShape.fillRect(400, 10, 150, 50); // x, y, width, height
+  this.buttonShape.setInteractive(new Phaser.Geom.Rectangle(400, 10, 150, 50), Phaser.Geom.Rectangle.Contains);
+  this.buttonText = this.add.text(450, 25, 'Reel', { color: '#ffffff' }); // Change position and text as you wish
+  this.onClickButton = () => {
+      console.log('Button was clicked!');
+      
+  };
+  
+  // Then add the event listener
+  this.buttonShape.on('pointerdown', this.onClickButton);
+
+
+
 
   let water = {
     graphics: this.add.graphics(),
@@ -113,11 +130,6 @@ function createSlider() {
     let angle = Phaser.Math.Linear(0, -90, slideAmount / 200);
     rod.setAngle(angle);
 
-
-
-
-
-
   
   });
 
@@ -132,3 +144,4 @@ function createSlider() {
     rod.setAngle(0);
   });
 }
+
