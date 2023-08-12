@@ -18,10 +18,6 @@ class FishManager {
                 //now create the fish within that location
                 let fish = new Fish(this.scene, this.water, x, y, 'fish');
                 
-                
-                
-                
-                
                 this.fishes.push(fish); // Store the fish in the array
             }
     

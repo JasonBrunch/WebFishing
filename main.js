@@ -15,35 +15,33 @@ const config = {
 };
 
 function preload() {
-
   // Load assets
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
+  this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
   this.load.image('guyInBoat', 'GuyInABoat.png')
+
 }
-  
-function create() {
   // Create objects, initialize variables, set up the game world
-  //this.isCastable = true;
-  //this.lineCast = false;
+function create() {
+  //initialize variables
+  this.isLineCast = false;
+  this.isCastable = true;
   
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
+  //Reel button
   this.buttonShape = this.add.graphics({ fillStyle: { color: 0x00AA00 } }); // Change color as you wish
-
   this.buttonShape.fillRect(400, 10, 150, 50); // x, y, width, height
   this.buttonShape.setInteractive(new Phaser.Geom.Rectangle(400, 10, 150, 50), Phaser.Geom.Rectangle.Contains);
   this.buttonText = this.add.text(450, 25, 'Reel', { color: '#ffffff' }); // Change position and text as you wish
   this.onClickButton = () => {
-      console.log('Button was clicked!');
-      
+      reelLine(this);
+
   };
-  
   // Then add the event listener
   this.buttonShape.on('pointerdown', this.onClickButton);
 
-
-
-
+  //Create water
   let water = {
     graphics: this.add.graphics(),
     x: 0,
@@ -61,6 +59,7 @@ function create() {
     // More methods as needed
   };
 
+  //Fish animation
   this.anims.create({
     key: 'swim',
     frames: this.anims.generateFrameNumbers('fish', { start: 0, end: 2 }), 
@@ -84,8 +83,6 @@ function create() {
   // Update the boat guy's y-coordinate to the correct value
   boatGuy.setY(boatGuyY);
 
-
-
   // Determine where the rod's origin should be, relative to the boat guy
   let rodOffsetX = -30; // Example value, adjust as needed
   let rodOffsetY = 10; // Example value, adjust as needed
@@ -105,6 +102,7 @@ function update() {
 }
 const game = new Phaser.Game(config);
 
+//Casting Slider Logic
 function createSlider() {
   let sliderY = 20;
   let sliderX = 200;
@@ -119,29 +117,38 @@ function createSlider() {
 
   // Add the drag event to capture the movement of the slider
   this.sliderKnob.on('drag', (pointer, dragX, dragY) => {
+    //First make sure casting is allowed
+    if(this.isCastable == true){
 
-    // Make sure to constrain the dragX to the bounds of the slider
-    this.sliderKnob.x = Phaser.Math.Clamp(dragX, sliderX - (sliderWidth / 2), sliderX + (sliderWidth / 2));
-
-    slideAmount = this.sliderKnob.x - (sliderX + (sliderWidth / 2));
-    slideAmount = Math.abs(this.sliderKnob.x - (sliderX + (sliderWidth / 2)));
     
 
-    let angle = Phaser.Math.Linear(0, -90, slideAmount / 200);
-    rod.setAngle(angle);
+      // Make sure to constrain the dragX to the bounds of the slider
+      this.sliderKnob.x = Phaser.Math.Clamp(dragX, sliderX - (sliderWidth / 2), sliderX + (sliderWidth / 2));
 
-  
+      slideAmount = this.sliderKnob.x - (sliderX + (sliderWidth / 2));
+      slideAmount = Math.abs(this.sliderKnob.x - (sliderX + (sliderWidth / 2)));
+      
+
+      let angle = Phaser.Math.Linear(0, -90, slideAmount / 200);
+      rod.setAngle(angle);
+
+    }
   });
 
   // Add the dragend event to reset the knob to the right end of the slider
   this.sliderKnob.on('dragend', () => {
-    this.sliderKnob.x = sliderX + (sliderWidth / 2); // Reset the knob to the right end
-    
-    //call a cast line method and pass in the slideAmount
-    castLine(slideAmount);
-    
-    slideAmount = 0;
-    rod.setAngle(0);
+    if(this.isCastable == true){
+      this.sliderKnob.x = sliderX + (sliderWidth / 2); // Reset the knob to the right end
+      
+      //call a cast line method and pass in the slideAmount
+      castLine(this, slideAmount);
+      //set isCastable to false
+      this.isCastable = false;
+      this.isLineCast = true;
+      
+      slideAmount = 0;
+      rod.setAngle(0);
+    }
   });
 }
 

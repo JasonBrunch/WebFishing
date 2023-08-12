@@ -1,4 +1,9 @@
-function castLine(power) {
+let lineGraphics;
+let bobber;
+let hookSprite;
+
+function castLine(sceneContext, power) {
+        
 
         console.log("CASTING WITH POWER: " + power);
 
@@ -23,19 +28,38 @@ function castLine(power) {
         //let startCircle = game.scene.scenes[0].add.circle(startX, startY, 5, 0xff0000);
 
         // Draw a red circle at the ending point, this can be used for the bobber
-        let endCircle = game.scene.scenes[0].add.circle(endX, endY, 5, 0xff0000);
+        bobber = game.scene.scenes[0].add.circle(endX, endY, 5, 0xff0000);
 
         // Draw a black line between the start and end points (horizontal casting line)
-        let lineGraphics = game.scene.scenes[0].add.graphics();
+        lineGraphics = game.scene.scenes[0].add.graphics();
         lineGraphics.lineStyle(2, 0x000000);
         lineGraphics.lineBetween(startX, startY, endX, endY);
 
         // Draw a black line from the water's surface down to the depth (vertical line)
         lineGraphics.lineBetween(endX, endY, endX, endYDepth);
 
+        // Create the hook sprite at the end of the line
+        hookSprite = createHook(sceneContext, endX, endYDepth, 'hooks');
+
  
     
 }
-function reelLine(){
+function reelLine(sceneContext) {
+        if (sceneContext.isLineCast) {
 
-}
+            // Remove the line graphics by destroying the object
+            if (lineGraphics) {
+                lineGraphics.clear();
+                lineGraphics.destroy();
+            }
+            if(bobber){
+                bobber.destroy();
+            }
+            if (hookSprite) {
+                hookSprite.destroy();
+            }
+            sceneContext.isLineCast = false;
+            sceneContext.isCastable = true;
+    
+        }
+    }
