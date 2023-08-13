@@ -28,6 +28,7 @@ function create() {
   this.isLineCast = false;
   this.isCastable = true;
   
+  
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
   //Reel button
   this.buttonShape = this.add.graphics({ fillStyle: { color: 0x00AA00 } }); // Change color as you wish
@@ -94,12 +95,39 @@ function create() {
   
   createSlider.call(this);
 }
-function update() {
-  // Update game logic, handle input, move characters, etc.
-  
-  //move fish:
-  this.fishManager.moveFish(); // Use 'this' to access the fishManager instance created in the create function
+
+
+//UPDATE
+
+let accumulatedTime = 0;
+function update(time, delta) {
+  // Move fish
+  this.fishManager.moveFish();
+
+  // Increment the accumulated time by the delta (time since last frame)
+  accumulatedTime += delta;
+
+  // If 2 seconds (2000 milliseconds) have passed, perform the check
+  if (accumulatedTime >= 1000) {
+    // ONLY CHECK BAIT IF IT'S CASTED
+    if (this.isLineCast) {
+      if (currentBait) {
+        let baitLocation = currentBait.getLocation();
+        // Check if baitLocation is not null before proceeding
+        if (baitLocation) {
+          this.fishManager.fishes.forEach(fish => fish.checkBait(baitLocation));
+          accumulatedTime = 0;
+        } else {
+          console.error('Bait location is null!'); // Logging error if bait location is null
+        }
+      } else {
+        console.error('Current bait is null!'); // Logging error if currentBait is null
+      }
+    }
+  }
 }
+
+
 const game = new Phaser.Game(config);
 
 //Casting Slider Logic

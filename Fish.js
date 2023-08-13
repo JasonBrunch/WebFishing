@@ -29,6 +29,24 @@ class Fish {
   
     return { x: targetX, y: targetY };
   }
+  checkBait(baitLocation) {
+    console.log("FISHY FISHY LOOKy FOODY");
+    // Get fish position (assuming you have a method to get the position)
+    let fishPosition = this.getPosition();
+
+    // Calculate the distance between the fish and the bait
+    let dx = baitLocation.x - fishPosition.x;
+    let dy = baitLocation.y - fishPosition.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Compare the distance to the bait's lure distance
+    if (distance <= currentBait.lureDistance) {
+        console.log("Fish is attracted to the bait!");
+        // You can put additional logic here to handle the fish's response
+    } else {
+        console.log("Fish is not attracted to the bait.");
+    }
+}
   // You can add methods to move the fish, check boundaries, etc.
   updateFish() {
     // Move towards the target (you can adjust the speed)
@@ -60,5 +78,8 @@ class Fish {
       // If so, generate a new target
       this.movementTarget = this.generateNewTarget();
     }
+  }
+  getPosition() {
+    return { x: this.sprite.x, y: this.sprite.y };
   }
 }
