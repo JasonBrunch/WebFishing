@@ -27,6 +27,7 @@ function create() {
   //initialize variables
   this.isLineCast = false;
   this.isCastable = true;
+  this.isFishOn = false;
   
   
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
@@ -97,32 +98,36 @@ function create() {
 }
 
 
-//UPDATE
-
+/////////////////////////UPDATE SECTION//////////////////////////////////
+const CHECK_BAIT_INTERVAL = 1000;
 let accumulatedTime = 0;
-function update(time, delta) {
-  // Move fish
-  this.fishManager.moveFish();
+
+function update(delta) {
+  this.fishManager.activateFish();
 
   // Increment the accumulated time by the delta (time since last frame)
   accumulatedTime += delta;
 
-  // If 2 seconds (2000 milliseconds) have passed, perform the check
-  if (accumulatedTime >= 1000) {
-    // ONLY CHECK BAIT IF IT'S CASTED
-    if (this.isLineCast) {
-      if (currentBait) {
-        let baitLocation = currentBait.getLocation();
-        // Check if baitLocation is not null before proceeding
-        if (baitLocation) {
-          this.fishManager.fishes.forEach(fish => fish.checkBait(baitLocation));
-          accumulatedTime = 0;
-        } else {
-          console.error('Bait location is null!'); // Logging error if bait location is null
-        }
+  if (accumulatedTime >= CHECK_BAIT_INTERVAL) {
+    checkBaitStatus(this); // Call the standalone function with the scene as the context
+    accumulatedTime = 0; // Resetting the accumulated time
+  }
+}
+
+function checkBaitStatus(scene) {
+  console.log(scene.isLineCast + " - " + scene.isFishOn);
+  // ONLY CHECK BAIT IF IT'S CASTED
+  if (scene.isLineCast && !scene.isFishOn) {
+    if (currentBait) {
+      let baitLocation = currentBait.getLocation();
+      // Check if baitLocation is not null before proceeding
+      if (baitLocation) {
+        scene.fishManager.fishes.forEach(fish => fish.checkBait(baitLocation));
       } else {
-        console.error('Current bait is null!'); // Logging error if currentBait is null
+        console.error('Bait location is null!'); // Logging error if bait location is null
       }
+    } else {
+      console.error('Current bait is null!'); // Logging error if currentBait is null
     }
   }
 }

@@ -1,6 +1,7 @@
 let lineGraphics;
 let bobber;
 let hookSprite;
+let hookPoint;
 
 function castLine(sceneContext, power) {
         
@@ -39,7 +40,9 @@ function castLine(sceneContext, power) {
         lineGraphics.lineBetween(endX, endY, endX, endYDepth);
 
         // Create the hook sprite at the end of the line
-        hookSprite = createHook(sceneContext, endX, endYDepth, 'hooks');
+        let hookInfo = createHook(sceneContext, endX, endYDepth, 'hooks');
+        hookSprite = hookInfo.sprite; // Assign to global variable
+        hookPoint = hookInfo.hookPoint; // Assign to global variable
 
  
     
