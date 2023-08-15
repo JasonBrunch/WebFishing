@@ -115,7 +115,6 @@ function update(delta) {
 }
 
 function checkBaitStatus(scene) {
-  console.log(scene.isLineCast + " - " + scene.isFishOn);
   // ONLY CHECK BAIT IF IT'S CASTED
   if (scene.isLineCast && !scene.isFishOn) {
     if (currentBait) {

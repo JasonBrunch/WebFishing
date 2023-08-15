@@ -30,6 +30,10 @@ class FishManager {
 
         this.fishes.forEach(fish =>fish.updateFish());
     }
+    fishHooked(){
+        console.log("FISH HOOKED MODE ENGAGED");
+        this.fishes.forEach(fish =>fish.biteOn());
+    }
  }
 
 

@@ -4,6 +4,7 @@ class Fish {
     this.water = water; // Storing the water boundaries
     this.isSwimming = true;
     this.isBaited = false;
+    this.isHooked = false;
     this.biteDistance = 10;
 
     // Creating the sprite and storing it in the instance
@@ -39,7 +40,6 @@ class Fish {
 ///////////////////////FISH CHECKS BAIT SECTION///////////////////////////////////
   checkBait(baitLocation) {
     if(this.isSwimming){
-      console.log("FISH CHECKING FOR BAIT");
       // Get fish position (assuming you have a method to get the position)
       let fishPosition = this.getPosition();
 
@@ -50,7 +50,6 @@ class Fish {
 
       // Compare the distance to the bait's lure distance
       if (distance <= currentBait.lureDistance) {
-          console.log("Fish is attracted to the bait!");
           this.isBaited = true;
           this.isSwimming = false;
       } 
@@ -60,7 +59,6 @@ class Fish {
     }
   //FISH TRIES TO TAKE A BITE OF BAIT
     if(this.isBaited){
-      console.log("Checking position for bite.");
       //check how far away the bait is
       let fishPosition = this.getPosition();
 
@@ -73,10 +71,8 @@ class Fish {
       if(distance <= this.biteDistance){
         let biteChoice = this.considerBiting();
         if(biteChoice == false){
-          console.log("No bite today");
         }
         if(biteChoice == true){
-        console.log("Yes bite todate");
         this.bite();
 
 
@@ -86,18 +82,23 @@ class Fish {
   }
   
 
-considerBiting(){
-  console.log("CONSIDERING A BITE");
-  return false;
-}
+  considerBiting(){
+    if (Math.random() < 0.5) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 bite(){
   console.log("FISH BITES THE HOOK")
-  this.sprite.setFrame(8);
+  this.sprite.setFrame(3);
   //replace the hook sprite with this sprite, but delete the hook sprite...
 
   //set this guy to bite mode remove is baited
-
+  this.isBaited = false;
+  this.isHooked = true;
   //trigger all isbaited fish to swim away
+  this.scene.fishManager.fishHooked();
   //trigger a bite mode to get all the other fish to swim away while this one hangs out on the hook here.
 }
 
@@ -159,5 +160,12 @@ moveTowardsTarget(target, speed) {
   }
   getPosition() {
     return { x: this.sprite.x, y: this.sprite.y };
+  }
+  biteOn(){
+    console.log("Bite On Starting");
+    if(this.isBaited){
+      this.isBaited = false;
+      this.isSwimming = true;
+    }
   }
 }
