@@ -1,13 +1,10 @@
 let lineGraphics;
 let bobber;
+
 let hookSprite;
 let hookPoint;
 
 function castLine(sceneContext, power) {
-        
-
-        console.log("CASTING WITH POWER: " + power);
-
         let offsetX = 0; // Example value, adjust as needed
         let offsetY = 30; // Example value, adjust as needed
 
@@ -44,12 +41,14 @@ function castLine(sceneContext, power) {
         hookSprite = hookInfo.sprite; // Assign to global variable
         hookPoint = hookInfo.hookPoint; // Assign to global variable
 
- 
-    
+        //what it should do
+        //create the bait
 }
 function reelLine(sceneContext) {
         if (sceneContext.isLineCast) {
 
+            //set state of fish back to swimming
+            sceneContext.fishManager.resetFish();
             // Remove the line graphics by destroying the object
             if (lineGraphics) {
                 lineGraphics.clear();
@@ -66,3 +65,8 @@ function reelLine(sceneContext) {
     
         }
     }
+function testReelLine(sceneContext){
+    if(sceneContext.isLineCast){
+
+    }
+}

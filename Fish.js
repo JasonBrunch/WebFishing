@@ -2,22 +2,20 @@ class Fish {
   constructor(scene, water, x, y, texture) {
     this.scene = scene; // Storing the Phaser scene
     this.water = water; // Storing the water boundaries
-    this.isSwimming = true;
-    this.isBaited = false;
-    this.isHooked = false;
-    this.biteDistance = 10;
+
+    this.state = 'swimming'; // Initial state for the fish
+    
+    this.biteDistance = 10; // Distance for biting
 
     // Creating the sprite and storing it in the instance
     this.sprite = this.scene.add.sprite(x, y, texture, 0);
 
     // Play the 'swim' animation
     this.sprite.anims.play('swim');
+
     // Set an initial target for the fish
     this.movementTarget = this.generateNewTarget();
   }
-
-
-
 
 
   // Generates a new random target within the water boundaries
@@ -38,134 +36,136 @@ class Fish {
     return { x: targetX, y: targetY };
   }
 ///////////////////////FISH CHECKS BAIT SECTION///////////////////////////////////
-  checkBait(baitLocation) {
-    if(this.isSwimming){
-      // Get fish position (assuming you have a method to get the position)
-      let fishPosition = this.getPosition();
+checkBait() {
+  if (!currentBait) {
+    console.error("No current bait set");
+    return; // Early return if no current bait is set
+  }
+  let baitLocation = currentBait.getLocation(); // Assuming currentBait has a method called getLocation
 
-      // Calculate the distance between the fish and the bait
+  if (this.state === 'swimming') {
+    let fishPosition = this.getPosition();
+    let dx = baitLocation.x - fishPosition.x;
+    let dy = baitLocation.y - fishPosition.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Compare the distance to the bait's lure distance
+    if (distance <= currentBait.lureDistance) { // Directly access currentBait.lureDistance
+      this.state = 'baited';
+      this.baitInterest = 0; // Reset or initialize the interest counter
+    }
+  }
+
+  if (this.state === 'baited') {
+    this.baitInterest++; // Increment the interest counter
+
+    if (this.baitInterest >= 3) { // Check if enough interest has accumulated
+      // Check how far away the bait is
+      let fishPosition = this.getPosition();
       let dx = baitLocation.x - fishPosition.x;
       let dy = baitLocation.y - fishPosition.y;
       let distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Compare the distance to the bait's lure distance
-      if (distance <= currentBait.lureDistance) {
-          this.isBaited = true;
-          this.isSwimming = false;
-      } 
-      else {
-        // console.log("Fish is not attracted to the bait.");
-      }
-    }
-  //FISH TRIES TO TAKE A BITE OF BAIT
-    if(this.isBaited){
-      //check how far away the bait is
-      let fishPosition = this.getPosition();
-
-      // Calculate the distance between the fish and the bait
-      let dx = baitLocation.x - fishPosition.x;
-      let dy = baitLocation.y - fishPosition.y;
-      let distance = Math.sqrt(dx * dx + dy * dy)
-
-      //if in range consider a bite:
-      if(distance <= this.biteDistance){
+      // If in range, consider a bite
+      if (distance <= this.biteDistance) {
         let biteChoice = this.considerBiting();
-        if(biteChoice == false){
-        }
-        if(biteChoice == true){
-        this.bite();
-
-
+        if (biteChoice) {
+          this.bite();
         }
       }
     }
   }
+}
   
+//////////////////////////////////////FISH BITING SECTION///////////////////////////////
+considerBiting() {
+  return Math.random() < 0.5;
+}
 
-  considerBiting(){
-    if (Math.random() < 0.5) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-bite(){
-  console.log("FISH BITES THE HOOK")
+bite() {
+  console.log("FISH BITES THE HOOK");
+  this.state = 'hooked';
+  // Turn off the animation
+  this.sprite.anims.pause();
+
   this.sprite.setFrame(3);
-  //replace the hook sprite with this sprite, but delete the hook sprite...
 
-  //set this guy to bite mode remove is baited
-  this.isBaited = false;
-  this.isHooked = true;
-  //trigger all isbaited fish to swim away
+  // Replace the hook sprite with this sprite, but delete the hook sprite...
+  swapHookSpriteTexture(this.scene, this.sprite.texture.key, 3);
+  this.sprite.setVisible(false); // Set the fish sprite's visibility to false
+
+  // Trigger all baited fish to swim away
   this.scene.fishManager.fishHooked();
-  //trigger a bite mode to get all the other fish to swim away while this one hangs out on the hook here.
+  // Trigger a bite mode to get all the other fish to swim away while this one hangs out on the hook here.
 }
 
-
-moveTowardsTarget(target, speed) {
-  let directionX = target.x - this.sprite.x;
-  let directionY = target.y - this.sprite.y;
-
-  // Normalize the direction
-  let magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-  directionX /= magnitude;
-  directionY /= magnitude;
-
-  // Update the sprite's position
-  this.sprite.x += directionX * speed;
-  this.sprite.y += directionY * speed;
-
-  // Flip the sprite if it's moving to the left
-  if (directionX < 0) {
-    this.sprite.setScale(-1, 1); // Flips the sprite horizontally
-  } else {
-    this.sprite.setScale(1, 1); // Resets the flip when moving right
+biteOn() {
+  // Make all fish except the one that bit swim away
+  if (this.state === 'baited') {
+    console.log("DEBUGGED");
+    this.state = 'swimming'; // Update state to swimming
+    // Get a random movement target
+    this.movementTarget = this.generateNewTarget();
+    // Swim away
+    this.moveTowardsTarget(this.movementTarget, 1);
   }
 }
+
+
+
+
+
+////////////////////////////////SWIMMING SECTION/////////////////////////////
+
+  moveTowardsTarget(target, speed) {
+    let directionX = target.x - this.sprite.x;
+    let directionY = target.y - this.sprite.y;
+
+    // Normalize the direction
+    let magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
+    directionX /= magnitude;
+    directionY /= magnitude;
+
+    // Update the sprite's position
+    this.sprite.x += directionX * speed;
+    this.sprite.y += directionY * speed;
+
+    // Flip the sprite if it's moving to the left
+    if (directionX < 0) {
+      this.sprite.setScale(-1, 1); // Flips the sprite horizontally
+    } else {
+      this.sprite.setScale(1, 1); // Resets the flip when moving right
+    }
+  }
 /////////////////////////////////FISH UPDATE SECTION///////////////////////////////////////
-  updateFish() {
-    if(this.isSwimming){
-      let speed = 1;
-     this.moveTowardsTarget(this.movementTarget,speed)
+updateFish() {
+  if (this.state === 'swimming') {
+    let speed = 1;
+    this.moveTowardsTarget(this.movementTarget, speed);
 
-      // Check if the target has been reached
-      if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
-        // If so, generate a new target
-        this.movementTarget = this.generateNewTarget();
-      }
-    }
-
-    if(this.isBaited){
-      let speed = 0.1;
-      let baitLocation = currentBait.getLocation();
-
-      this.movementTarget = baitLocation;
-
-      //Check if close to target
-      if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
-            console.log("Fish reached Target");
-          }
-      else{
-          console.log("Baited Fish has not reached target");
-        let directionX = this.movementTarget.x - this.sprite.x;
-        let directionY = this.movementTarget.y - this.sprite.y;
-        this.moveTowardsTarget(this.movementTarget, speed)
-      }
-      
-
-      
-    
+    // Check if the target has been reached
+    if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
+      // If so, generate a new target
+      this.movementTarget = this.generateNewTarget();
     }
   }
-  getPosition() {
-    return { x: this.sprite.x, y: this.sprite.y };
-  }
-  biteOn(){
-    console.log("Bite On Starting");
-    if(this.isBaited){
-      this.isBaited = false;
-      this.isSwimming = true;
+
+  if (this.state === 'baited') {
+    let speed = 0.1;
+    let baitLocation = currentBait.getLocation();
+
+    this.movementTarget = baitLocation;
+
+    // Check if close to target
+    if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
+      // DO SOMETHING?
+    } else {
+      this.moveTowardsTarget(this.movementTarget, speed);
     }
   }
+}
+
+getPosition() {
+  return { x: this.sprite.x, y: this.sprite.y };
+}
 }

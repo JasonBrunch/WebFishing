@@ -38,13 +38,25 @@ function createHook(sceneContext, x, y, texture) {
     };
 
     // Draw a red circle at the bite point for visualization
-    let circle = sceneContext.add.circle(bitePoint.x, bitePoint.y, 5, 0xff0000);
+    //let circle = sceneContext.add.circle(bitePoint.x, bitePoint.y, 5, 0xff0000);
 
     currentBait.setSprite(sprite); // Store the sprite within the bait
     return { sprite: sprite, hookPoint: hookPoint }; // Return both sprite and hook point
 }
-function swapHookTexture(sceneContext, newTexture) {
+
+function swapHookSpriteTexture(sceneContext, newTexture, frameIndex) {
     if (hookSprite) {
-      hookSprite.setTexture(newTexture); // Change the texture
-    }
-  }
+        hookSprite.setTexture(newTexture);
+        if (typeof frameIndex !== 'undefined') {
+            hookSprite.setFrame(frameIndex);
+        }
+    
+    // Recalculate bite point if needed (if new texture height is different)
+    let bitePoint = {
+        x: hookSprite.x,
+        y: hookSprite.y + hookSprite.height * 0.5
+    };
+    
+    currentBait.setSprite(hookSprite); // Update the sprite within the bait
+}
+}

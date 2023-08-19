@@ -1,8 +1,10 @@
+const CHECK_BAIT_INTERVAL = 1000;
 class FishManager {
     constructor(scene, water) {
         this.scene = scene; // Storing the Phaser scene to access it later
         this.water = water; // Storing the water boundaries to access it later
         this.fishes = []; // An array to hold the fish sprites
+        this.accumulatedTime = 0;
     }
 
     createFish(amount) {
@@ -23,17 +25,48 @@ class FishManager {
     
         
         }
-    
-        // Other methods related to fish, such as updating their positions, can be added here
 
-    activateFish(){
-
-        this.fishes.forEach(fish =>fish.updateFish());
+        activateFish(delta) {
+            // Increment the accumulated time by the delta (time since last frame)
+            this.accumulatedTime += delta;
+            if (this.accumulatedTime >= CHECK_BAIT_INTERVAL) {
+              this.checkBait();
+              this.accumulatedTime = 0; // Resetting the accumulated time
+            }
+            
+            // Always update the fish (swimming behavior)
+            this.fishes.forEach(fish => fish.updateFish());
+          }
+        
+          checkBait() {
+            // Check if it's time to check for bait
+            if (currentBait && this.scene.isLineCast && !this.scene.isFishOn) {
+              let baitLocation = currentBait.getLocation();
+              if (baitLocation) {
+                this.fishes.forEach(fish => fish.checkBait(baitLocation));
+              } else {
+                console.error('Bait location is null!'); // Logging error if bait location is null
+              }
+            }
+          }
+        
+ 
+        
+          fishHooked(hookedFish) {
+            currentBait = null;
+            // Iterate over all fish
+            this.fishes.forEach(fish => {
+              // If the fish is in the 'baited' state and not the hooked fish, tell it to swim away
+              if (fish.state === 'baited' && fish !== hookedFish) {
+                fish.biteOn(); // Call the biteOn method on each fish
+              }
+            });
+          }
+    resetFish() {
+      for (let fish of this.fishes) {
+        fish.state = 'swimming';
+      }
     }
-    fishHooked(){
-        console.log("FISH HOOKED MODE ENGAGED");
-        this.fishes.forEach(fish =>fish.biteOn());
-    }
- }
+}
 
 

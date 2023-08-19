@@ -8,9 +8,9 @@ const config = {
     height: gameContainer.offsetHeight,
     parent: 'game-area', // This tells Phaser to append the canvas to the specified element
     scene: {
-      preload: preload,
-      create: create,
-      update: update
+    preload: preload,
+    create: create,
+    update: update
     }
 };
 
@@ -20,64 +20,27 @@ function preload() {
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
   this.load.image('guyInBoat', 'GuyInABoat.png')
-
 }
-  // Create objects, initialize variables, set up the game world
+
+// Create objects, initialize variables, set up the game world
 function create() {
   //initialize variables
   this.isLineCast = false;
   this.isCastable = true;
   this.isFishOn = false;
-  
-  
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
-  //Reel button
-  this.buttonShape = this.add.graphics({ fillStyle: { color: 0x00AA00 } }); // Change color as you wish
-  this.buttonShape.fillRect(400, 10, 150, 50); // x, y, width, height
-  this.buttonShape.setInteractive(new Phaser.Geom.Rectangle(400, 10, 150, 50), Phaser.Geom.Rectangle.Contains);
-  this.buttonText = this.add.text(450, 25, 'Reel', { color: '#ffffff' }); // Change position and text as you wish
-  this.onClickButton = () => {
-      reelLine(this);
-
-  };
-  // Then add the event listener
-  this.buttonShape.on('pointerdown', this.onClickButton);
-
+  // Reel button
+  createButton(this, 400, 10, 150, 50, 'Reel', () => reelLine(this));
+  //new test reel button
+  createButton(this, 600, 10, 150, 50, 'Test', () => testReelLine(this));
   //Create water
-  let water = {
-    graphics: this.add.graphics(),
-    x: 0,
-    y: gameContainer.offsetHeight * 0.25, // Start at 25% down from the top
-    width: gameContainer.offsetWidth,
-    height: gameContainer.offsetHeight * 0.75, // Take up 75% of the height
-    fillColor: 0x0000FF,
-    draw: function() {
-        this.graphics.fillStyle(this.fillColor, 1);
-        this.graphics.fillRect(this.x, this.y, this.width, this.height);
-    },
-    contains: function(x, y) {
-        return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
-    },
-    // More methods as needed
-  };
-
+  this.water = createWater(this, gameContainer);
   //Fish animation
-  this.anims.create({
-    key: 'swim',
-    frames: this.anims.generateFrameNumbers('fish', { start: 0, end: 2 }), 
-    frameRate: 5, // Adjust this value to set the speed of the animation
-    repeat: -1 // -1 means the animation will repeat indefinitely
-  });
-  
+  createFishAnimation(this);
   // Create an instance of the FishManager
-  this.fishManager = new FishManager(this, water);
+  this.fishManager = new FishManager(this, this.water);
   // Create some fish using the FishManager
   this.fishManager.createFish(10);
-  // Draw the water
-  water.draw();      
-  // Store the water object in the scene so you can access it elsewhere
-  this.water = water;
-
   // Add the boat guy first (using a temporary y-coordinate)
   let boatGuy = this.add.sprite(125, 125, 'guyInBoat');
   // Determine the y-coordinate for the boat guy, considering the sprite's height
@@ -97,43 +60,14 @@ function create() {
   createSlider.call(this);
 }
 
-
-/////////////////////////UPDATE SECTION//////////////////////////////////
-const CHECK_BAIT_INTERVAL = 1000;
-let accumulatedTime = 0;
-
+////////////////////////////////UPDATE SECTION//////////////////////////////////
 function update(delta) {
-  this.fishManager.activateFish();
-
-  // Increment the accumulated time by the delta (time since last frame)
-  accumulatedTime += delta;
-
-  if (accumulatedTime >= CHECK_BAIT_INTERVAL) {
-    checkBaitStatus(this); // Call the standalone function with the scene as the context
-    accumulatedTime = 0; // Resetting the accumulated time
-  }
+  this.fishManager.activateFish(delta); // This will handle both fish activation and bait checking
 }
-
-function checkBaitStatus(scene) {
-  // ONLY CHECK BAIT IF IT'S CASTED
-  if (scene.isLineCast && !scene.isFishOn) {
-    if (currentBait) {
-      let baitLocation = currentBait.getLocation();
-      // Check if baitLocation is not null before proceeding
-      if (baitLocation) {
-        scene.fishManager.fishes.forEach(fish => fish.checkBait(baitLocation));
-      } else {
-        console.error('Bait location is null!'); // Logging error if bait location is null
-      }
-    } else {
-      console.error('Current bait is null!'); // Logging error if currentBait is null
-    }
-  }
-}
-
 
 const game = new Phaser.Game(config);
 
+/////////////////////////FUNCTIONS SECTION ///////////////////////////////////
 //Casting Slider Logic
 function createSlider() {
   let sliderY = 20;
@@ -151,16 +85,12 @@ function createSlider() {
   this.sliderKnob.on('drag', (pointer, dragX, dragY) => {
     //First make sure casting is allowed
     if(this.isCastable == true){
-
-    
-
       // Make sure to constrain the dragX to the bounds of the slider
       this.sliderKnob.x = Phaser.Math.Clamp(dragX, sliderX - (sliderWidth / 2), sliderX + (sliderWidth / 2));
 
       slideAmount = this.sliderKnob.x - (sliderX + (sliderWidth / 2));
       slideAmount = Math.abs(this.sliderKnob.x - (sliderX + (sliderWidth / 2)));
       
-
       let angle = Phaser.Math.Linear(0, -90, slideAmount / 200);
       rod.setAngle(angle);
 
@@ -181,6 +111,42 @@ function createSlider() {
       slideAmount = 0;
       rod.setAngle(0);
     }
+  });
+}
+
+function createButton(scene, x, y, width, height, text, callback) {
+  const buttonShape = scene.add.graphics({ fillStyle: { color: 0x00AA00 } });
+  buttonShape.fillRect(x, y, width, height);
+  buttonShape.setInteractive(new Phaser.Geom.Rectangle(x, y, width, height), Phaser.Geom.Rectangle.Contains);
+
+  const buttonText = scene.add.text(x + width / 4, y + height / 4, text, { color: '#ffffff' });
+  buttonShape.on('pointerdown', callback);
+}
+function createWater(scene, gameContainer) {
+  const water = {
+    graphics: scene.add.graphics(),
+    x: 0,
+    y: gameContainer.offsetHeight * 0.25,
+    width: gameContainer.offsetWidth,
+    height: gameContainer.offsetHeight * 0.75,
+    fillColor: 0x0000FF,
+    draw() {
+      this.graphics.fillStyle(this.fillColor, 1);
+      this.graphics.fillRect(this.x, this.y, this.width, this.height);
+    },
+    contains(x, y) {
+      return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
+    }
+  };
+  water.draw(); // draw the water initially
+  return water;
+}
+function createFishAnimation(scene) {
+  scene.anims.create({
+    key: 'swim',
+    frames: scene.anims.generateFrameNumbers('fish', { start: 0, end: 2 }),
+    frameRate: 5, // Adjust this value to set the speed of the animation
+    repeat: -1 // -1 means the animation will repeat indefinitely
   });
 }
 
