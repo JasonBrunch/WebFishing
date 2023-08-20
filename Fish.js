@@ -10,6 +10,10 @@ class Fish {
     // Creating the sprite and storing it in the instance
     this.sprite = this.scene.add.sprite(x, y, texture, 0);
 
+    this.depth = Math.random(); // Value between 0 (far) and 1 (near)
+    // Apply a random opacity between 0.5 and 1
+    this.sprite.alpha = 0.3 + (1 - this.depth) * 0.7; // Closer fish have higher opacity
+
     // Play the 'swim' animation
     this.sprite.anims.play('swim');
 
@@ -34,6 +38,13 @@ class Fish {
     targetY = Math.min(this.water.y + this.water.height, targetY);
   
     return { x: targetX, y: targetY };
+  }
+  setDepth(newDepth) {
+    // Ensure newDepth is between 0 and 1
+    this.depth = Math.max(0, Math.min(1, newDepth));
+  
+    // Update the alpha value based on the new depth
+    this.sprite.alpha = 0.3 + (1 - this.depth) * 0.7;
   }
 ///////////////////////FISH CHECKS BAIT SECTION///////////////////////////////////
 fishCheckBait() {
@@ -93,6 +104,8 @@ bite() {
   // Replace the hook sprite with this sprite, but delete the hook sprite...
   swapHookSpriteTexture(this.scene, this.sprite.texture.key, 3);
   this.sprite.setVisible(false); // Set the fish sprite's visibility to false
+
+  this.setDepth(1); 
 
   // Trigger all baited fish to swim away
   this.scene.fishManager.fishHooked(this);

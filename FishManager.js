@@ -9,23 +9,25 @@ class FishManager {
     }
 
     createFish(amount) {
-        
-            for (let i = 0; i < amount; i++) {
-                // Generate a random x coordinate within the water boundaries
-                let x = this.water.x + Math.random() * this.water.width;
+      for (let i = 0; i < amount; i++) {
+        // Generate a random x coordinate within the water boundaries
+        let x = this.water.x + Math.random() * this.water.width;
     
-                // Generate a random y coordinate within the water boundaries
-                let y = this.water.y + Math.random() * this.water.height;
+        // Get a reference to a sample fish sprite to determine its height (if you have access to it)
+        let fishSpriteHeight = this.scene.textures.get('fish').get(0).height;
     
-                
-                //now create the fish within that location
-                let fish = new Fish(this.scene, this.water, x, y, 'fish');
-                
-                this.fishes.push(fish); // Store the fish in the array
-            }
+        // Calculate the buffer from the water's surface
+        let buffer = fishSpriteHeight * 0.5; // You can adjust the buffer value according to your need
     
-        
-        }
+        // Generate a random y coordinate within the water boundaries, considering the buffer
+        let y = this.water.y + buffer + Math.random() * (this.water.height - buffer * 2);
+    
+        // Now create the fish within that location
+        let fish = new Fish(this.scene, this.water, x, y, 'fish');
+    
+        this.fishes.push(fish); // Store the fish in the array
+      }
+    }
         createOneFish(){
           // Generate a random x coordinate within the water boundaries
           let x = this.water.x + Math.random() * this.water.width;
