@@ -1,0 +1,6 @@
+{
+    "javascript.referencesCodeLens.enabled": true,
+    "emmet.includeLanguages": {
+        "javascript.implicitProjectConfig.checkJs": "true"
+    }
+}

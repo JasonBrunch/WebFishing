@@ -1,4 +1,5 @@
 const CHECK_BAIT_INTERVAL = 1000;
+let currentFishHooked = null;
 class FishManager {
     constructor(scene, water) {
         this.scene = scene; // Storing the Phaser scene to access it later
@@ -43,7 +44,7 @@ class FishManager {
             if (currentBait && this.scene.isLineCast && !this.scene.isFishOn) {
               let baitLocation = currentBait.getLocation();
               if (baitLocation) {
-                this.fishes.forEach(fish => fish.checkBait(baitLocation));
+                this.fishes.forEach(fish => fish.fishCheckBait(baitLocation));
               } else {
                 console.error('Bait location is null!'); // Logging error if bait location is null
               }
@@ -52,7 +53,8 @@ class FishManager {
         
  
         
-          fishHooked(hookedFish) {
+          fishHooked(fish) {
+            currentFishHooked = fish;
             currentBait = null;
             // Iterate over all fish
             this.fishes.forEach(fish => {

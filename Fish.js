@@ -36,12 +36,12 @@ class Fish {
     return { x: targetX, y: targetY };
   }
 ///////////////////////FISH CHECKS BAIT SECTION///////////////////////////////////
-checkBait() {
+fishCheckBait() {
   if (!currentBait) {
     console.error("No current bait set");
     return; // Early return if no current bait is set
   }
-  let baitLocation = currentBait.getLocation(); // Assuming currentBait has a method called getLocation
+  let baitLocation = currentBait.getLocation(); 
 
   if (this.state === 'swimming') {
     let fishPosition = this.getPosition();
@@ -95,7 +95,7 @@ bite() {
   this.sprite.setVisible(false); // Set the fish sprite's visibility to false
 
   // Trigger all baited fish to swim away
-  this.scene.fishManager.fishHooked();
+  this.scene.fishManager.fishHooked(this);
   // Trigger a bite mode to get all the other fish to swim away while this one hangs out on the hook here.
 }
 

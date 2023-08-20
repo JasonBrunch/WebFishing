@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6"
+    },
+    "include": ["C:\\Users\\Sampson\\Desktop\\WebFishing\\**\\*"],
+    "exclude": ["node_modules"]
+}

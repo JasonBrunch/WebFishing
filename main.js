@@ -28,11 +28,13 @@ function create() {
   this.isLineCast = false;
   this.isCastable = true;
   this.isFishOn = false;
+  this.isReeling = false;
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
-  // Reel button
-  createButton(this, 400, 10, 150, 50, 'Reel', () => reelLine(this));
+  
   //new test reel button
-  createButton(this, 600, 10, 150, 50, 'Test', () => testReelLine(this));
+  const testButtonShape = createButton(this, 600, 10, 150, 50, 'Test');
+  testButtonShape.on('pointerdown', () => this.isReeling = true);
+  testButtonShape.on('pointerup', () => this.isReeling = false);
   //Create water
   this.water = createWater(this, gameContainer);
   //Fish animation
@@ -58,12 +60,20 @@ function create() {
   rod.setOrigin(0, 1); // Set the origin to the bottom-left corner
   
   createSlider.call(this);
+
+  this.bubbles = createBubbles(this, this.water);
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////
 function update(delta) {
-  this.fishManager.activateFish(delta); // This will handle both fish activation and bait checking
+  if (this.isReeling) {
+    testReelLine(this);
+  }
+  this.fishManager.activateFish(delta); // Existing code
+  updateBubbles(this.bubbles, this.water);
 }
+
+
 
 const game = new Phaser.Game(config);
 
@@ -114,13 +124,13 @@ function createSlider() {
   });
 }
 
-function createButton(scene, x, y, width, height, text, callback) {
+function createButton(scene, x, y, width, height, text) {
   const buttonShape = scene.add.graphics({ fillStyle: { color: 0x00AA00 } });
   buttonShape.fillRect(x, y, width, height);
   buttonShape.setInteractive(new Phaser.Geom.Rectangle(x, y, width, height), Phaser.Geom.Rectangle.Contains);
 
   const buttonText = scene.add.text(x + width / 4, y + height / 4, text, { color: '#ffffff' });
-  buttonShape.on('pointerdown', callback);
+  return buttonShape;
 }
 function createWater(scene, gameContainer) {
   const water = {
@@ -130,15 +140,39 @@ function createWater(scene, gameContainer) {
     width: gameContainer.offsetWidth,
     height: gameContainer.offsetHeight * 0.75,
     fillColor: 0x0000FF,
-    draw() {
-      this.graphics.fillStyle(this.fillColor, 1);
-      this.graphics.fillRect(this.x, this.y, this.width, this.height);
+    
+    
+    draw(scene) {
+      // Create a canvas element
+      var gradientCanvas = document.createElement('canvas');
+      gradientCanvas.width = this.width;
+      gradientCanvas.height = this.height;
+    
+      // Get the canvas rendering context
+      var ctx = gradientCanvas.getContext('2d');
+    
+      // Create a linear gradient (from top to bottom)
+      var gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+      gradient.addColorStop(0, '#0099FF'); // Top color
+      gradient.addColorStop(1, '#000066'); // Bottom color
+    
+      // Apply the gradient to the entire canvas
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, this.width, this.height);
+    
+      // Create a Phaser texture from the canvas
+      var gradientTexture = scene.textures.createCanvas('waterGradient', this.width, this.height);
+      gradientTexture.context.drawImage(gradientCanvas, 0, 0);
+      gradientTexture.refresh();
+    
+      // Draw the texture using an image object (instead of a Graphics object)
+      scene.add.image(this.x, this.y, 'waterGradient').setOrigin(0, 0);
     },
     contains(x, y) {
       return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
     }
   };
-  water.draw(); // draw the water initially
+  water.draw(scene); // draw the water initially
   return water;
 }
 function createFishAnimation(scene) {
@@ -148,5 +182,29 @@ function createFishAnimation(scene) {
     frameRate: 5, // Adjust this value to set the speed of the animation
     repeat: -1 // -1 means the animation will repeat indefinitely
   });
+}
+
+function createBubbles(scene, water) {
+  let numberOfBubbles = 10;
+  let bubbles = [];
+
+  for (let i = 0; i < numberOfBubbles; i++) {
+    let x = Phaser.Math.Between(water.x, water.x + water.width);
+    let y = Phaser.Math.Between(water.y, water.y + water.height);
+    let bubble = scene.add.circle(x, y, 2, 0xFFFFFF, 0.5);
+    bubble.speed = Phaser.Math.Between(1, 3);
+    bubbles.push(bubble);
+  }
+
+  return bubbles;
+}
+function updateBubbles(bubbles, water) {
+  for (let bubble of bubbles) {
+    bubble.y -= bubble.speed;
+    if (bubble.y < water.y) {
+      bubble.y = water.y + water.height; // Reset the y position to the bottom of the water
+      bubble.x = Phaser.Math.Between(water.x, water.x + water.width); // Randomize the x position
+    }
+  }
 }
 
