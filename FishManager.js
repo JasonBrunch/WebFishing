@@ -26,6 +26,15 @@ class FishManager {
     
         
         }
+        createOneFish(){
+          // Generate a random x coordinate within the water boundaries
+          let x = this.water.x + Math.random() * this.water.width;
+          // Generate a random y coordinate within the water boundaries
+          let y = this.water.y + Math.random() * this.water.height;
+          //now create the fish within that location
+          let fish = new Fish(this.scene, this.water, x, y, 'fish');
+          return fish;
+        }
 
         activateFish(delta) {
             // Increment the accumulated time by the delta (time since last frame)
@@ -56,15 +65,21 @@ class FishManager {
           fishHooked(fish) {
             currentFishHooked = fish;
             currentBait = null;
+          
+            // Remove fish from array
+            this.fishes = this.fishes.filter(f => f !== currentFishHooked);
+          
             // Iterate over all fish
             this.fishes.forEach(fish => {
               // If the fish is in the 'baited' state and not the hooked fish, tell it to swim away
-              if (fish.state === 'baited' && fish !== hookedFish) {
+              if (fish.state === 'baited' && fish !== currentFishHooked) {
                 fish.biteOn(); // Call the biteOn method on each fish
               }
             });
-          }
-    resetFish() {
+          }   
+          
+          
+              resetFish() {
       for (let fish of this.fishes) {
         fish.state = 'swimming';
       }

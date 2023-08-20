@@ -166,8 +166,14 @@ function reelLine(sceneContext) {
         if (sceneContext.isLineCast) {
 
             //CHECK IF FISH IS CAUGHT and trigger a function with the following:
-            //REMOVE THAT FISH FROM THE FISHES ARRAY
+            if(currentFishHooked != null){
+                
             //show the fish caught screen
+            showFishCaughtScreen(sceneContext, currentFishHooked);
+            
+            }
+            
+
 
             //set state of fish back to swimming
             sceneContext.fishManager.resetFish();
@@ -184,6 +190,7 @@ function reelLine(sceneContext) {
             }
             sceneContext.isLineCast = false;
             sceneContext.isCastable = true;
+            currentFishHooked = null;
             
             
         }

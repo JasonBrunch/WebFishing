@@ -22,6 +22,9 @@ function preload() {
   this.load.image('guyInBoat', 'GuyInABoat.png')
 }
 
+
+
+//////////////////////////CREATE FUNCTION/////////////////////////////
 // Create objects, initialize variables, set up the game world
 function create() {
   //initialize variables
@@ -32,9 +35,16 @@ function create() {
   this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
   
   //new test reel button
-  const testButtonShape = createButton(this, 600, 10, 150, 50, 'Test');
-  testButtonShape.on('pointerdown', () => this.isReeling = true);
-  testButtonShape.on('pointerup', () => this.isReeling = false);
+  const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
+  reelButtonShape.on('pointerdown', () => this.isReeling = true);
+  reelButtonShape.on('pointerup', () => this.isReeling = false);
+
+  const testicleButtonShape = createButton(this,400,0,50,50,'test');
+  testicleButtonShape.on('pointerdown', () => {
+    testButtonFunction(this.fishManager, this);
+  });
+
+
   //Create water
   this.water = createWater(this, gameContainer);
   //Fish animation
@@ -44,6 +54,10 @@ function create() {
   // Create some fish using the FishManager
   this.fishManager.createFish(10);
   // Add the boat guy first (using a temporary y-coordinate)
+  
+
+  
+  
   let boatGuy = this.add.sprite(125, 125, 'guyInBoat');
   // Determine the y-coordinate for the boat guy, considering the sprite's height
   let boatGuyY = this.water.y - boatGuy.height / 2; // Assuming the anchor point is at the center of the sprite
@@ -62,6 +76,9 @@ function create() {
   createSlider.call(this);
 
   this.bubbles = createBubbles(this, this.water);
+
+
+  
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////
@@ -207,4 +224,9 @@ function updateBubbles(bubbles, water) {
     }
   }
 }
+function testButtonFunction(fishmanager, scene){
+  let testicleFish = fishmanager.createOneFish();
+  showFishCaughtScreen(scene, testicleFish);
+}
+
 
