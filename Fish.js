@@ -31,14 +31,14 @@ class Fish {
     let targetX = this.water.x + Math.random() * this.water.width;
   
     // Determine the range for y-coordinate (e.g., 10% of fish sprite's height)
-    let yRange = this.sprite.height * 0.1;
-    
+    let yRange = this.sprite.height;
+  
     // Generate a random y value within the range of the current y-coordinate
     let targetY = this.sprite.y + (Math.random() * yRange - yRange / 2);
   
-    // Ensure that the target y-coordinate is still within the water boundaries
-    targetY = Math.max(this.water.y, targetY);
-    targetY = Math.min(this.water.y + this.water.height, targetY);
+    // Ensure that the target y-coordinate is still within the water boundaries, considering the fish sprite's height
+    targetY = Math.max(this.water.y + this.sprite.height, targetY);
+    targetY = Math.min(this.water.y + this.water.height - this.sprite.height, targetY);
   
     return { x: targetX, y: targetY };
   }

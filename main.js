@@ -21,7 +21,9 @@ function preload() {
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
-  this.load.image('guyInBoat', 'GuyInABoat.png')
+  this.load.image('guyInBoat', 'GuyInABoat.png');
+  this.load.image('soundBtnSprite','SoundBtnSprite.png');
+  this.load.image('ReelBtnSprite','ReelBtn.png');
 
   //LOAD MUSIC FILE HERE:
   this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
@@ -40,9 +42,12 @@ function create() {
   createBackground(this, gameContainer);
   
   //new test reel button
-  const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
-  reelButtonShape.on('pointerdown', () => this.isReeling = true);
-  reelButtonShape.on('pointerup', () => this.isReeling = false);
+  //const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
+  const reelBtnShape = this.add.sprite(200, 100, 'ReelBtnSprite');
+  reelBtnShape.setInteractive();
+
+  reelBtnShape.on('pointerdown', () => this.isReeling = true);
+  reelBtnShape.on('pointerup', () => this.isReeling = false);
 
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
@@ -61,8 +66,9 @@ function create() {
     isMusicPlaying = !isMusicPlaying; // Toggle the state
   };
 
-  const musicOnButton = createButton(this,800,0,50,50,'Music');
-  musicOnButton.on('pointerdown', musicToggle); // use the local function
+  const musicOnButton = this.add.sprite(gameContainer.offsetWidth - 30, 40, 'soundBtnSprite'); // Adjust 50 based on the size of your sprite
+musicOnButton.setInteractive();
+musicOnButton.on('pointerdown', musicToggle);
   
 
   //Create water
@@ -173,9 +179,9 @@ function createWater(scene, gameContainer) {
   const water = {
     graphics: scene.add.graphics(),
     x: 0,
-    y: gameContainer.offsetHeight * 0.25,
+    y: gameContainer.offsetHeight * 0.30,
     width: gameContainer.offsetWidth,
-    height: gameContainer.offsetHeight * 0.75,
+    height: gameContainer.offsetHeight * 0.70,
     fillColor: 0x0000FF,
     
     
@@ -228,8 +234,12 @@ function createBubbles(scene, water) {
   for (let i = 0; i < numberOfBubbles; i++) {
     let x = Phaser.Math.Between(water.x, water.x + water.width);
     let y = Phaser.Math.Between(water.y, water.y + water.height);
-    let bubble = scene.add.circle(x, y, 2, 0xFFFFFF, 0.5);
-    bubble.speed = Phaser.Math.Between(1, 3);
+    
+    let bubbleSize = Phaser.Math.Between(0.5, 15);
+    let bubbleOpacity = 0.5 - ((bubbleSize - 0.5) / (15 - 0.5)) * 0.4;
+
+    let bubble = scene.add.circle(x, y, bubbleSize, 0xFFFFFF, bubbleOpacity);
+    bubble.speed = Phaser.Math.Between(5, 15); // Multiply the speed values by 10 or choose a higher range
     bubbles.push(bubble);
   }
 
@@ -237,7 +247,7 @@ function createBubbles(scene, water) {
 }
 function updateBubbles(bubbles, water) {
   for (let bubble of bubbles) {
-    bubble.y -= bubble.speed;
+    bubble.y -= bubble.speed * 0.1; // Multiplying by a fractional value to slow down the bubbles
     if (bubble.y < water.y) {
       bubble.y = water.y + water.height; // Reset the y position to the bottom of the water
       bubble.x = Phaser.Math.Between(water.x, water.x + water.width); // Randomize the x position
@@ -275,6 +285,9 @@ function createBackground(scene, gameContainer) {
 
   // Draw the texture using an image object
   scene.add.image(0, 0, 'backgroundGradient').setOrigin(0, 0);
+}
+function soundButton() {
+  console.log("click");
 }
 
 
