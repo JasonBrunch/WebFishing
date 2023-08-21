@@ -1,6 +1,8 @@
 //global variables
 let rod;
 const gameContainer = document.getElementById('game-area');
+let backgroundMusic;
+let isMusicPlaying = false; 
 
 const config = {
     type: Phaser.AUTO,
@@ -20,6 +22,9 @@ function preload() {
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
   this.load.image('guyInBoat', 'GuyInABoat.png')
+
+  //LOAD MUSIC FILE HERE:
+  this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
 }
 
 
@@ -32,7 +37,7 @@ function create() {
   this.isCastable = true;
   this.isFishOn = false;
   this.isReeling = false;
-  this.cameras.main.setBackgroundColor('#FFC0CB'); // Light Pink
+  createBackground(this, gameContainer);
   
   //new test reel button
   const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
@@ -43,7 +48,22 @@ function create() {
   testicleButtonShape.on('pointerdown', () => {
     testButtonFunction(this.fishManager, this);
   });
+  backgroundMusic = this.sound.add('backgroundMusic',{loop: true});
 
+  const musicToggle = () => {
+    if (isMusicPlaying) {
+      backgroundMusic.stop(); // Turn off music
+      console.log("turned off music");
+    } else {
+      backgroundMusic.play(); // Play music
+      console.log("Music turned On");
+    }
+    isMusicPlaying = !isMusicPlaying; // Toggle the state
+  };
+
+  const musicOnButton = createButton(this,800,0,50,50,'Music');
+  musicOnButton.on('pointerdown', musicToggle); // use the local function
+  
 
   //Create water
   this.water = createWater(this, gameContainer);
@@ -227,6 +247,34 @@ function updateBubbles(bubbles, water) {
 function testButtonFunction(fishmanager, scene){
   let testicleFish = fishmanager.createOneFish();
   showFishCaughtScreen(scene, testicleFish);
+}
+
+
+function createBackground(scene, gameContainer) {
+  // Create a canvas element
+  var gradientCanvas = document.createElement('canvas');
+  gradientCanvas.width = gameContainer.offsetWidth;
+  gradientCanvas.height = gameContainer.offsetHeight;
+
+  // Get the canvas rendering context
+  var ctx = gradientCanvas.getContext('2d');
+
+  // Create a linear gradient (from top to bottom)
+  var gradient = ctx.createLinearGradient(0, 0, 0, gradientCanvas.height);
+  gradient.addColorStop(0, '#000044'); // Top color (dark blue)
+  gradient.addColorStop(1, '#FFC0CB'); // Bottom color (light pink)
+
+  // Apply the gradient to the entire canvas
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
+
+  // Create a Phaser texture from the canvas
+  var gradientTexture = scene.textures.createCanvas('backgroundGradient', gradientCanvas.width, gradientCanvas.height);
+  gradientTexture.context.drawImage(gradientCanvas, 0, 0);
+  gradientTexture.refresh();
+
+  // Draw the texture using an image object
+  scene.add.image(0, 0, 'backgroundGradient').setOrigin(0, 0);
 }
 
 

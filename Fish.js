@@ -2,6 +2,9 @@ class Fish {
   constructor(scene, water, x, y, texture) {
     this.scene = scene; // Storing the Phaser scene
     this.water = water; // Storing the water boundaries
+    this.swimSpeed = getRandomSwimSpeed(); // Calls the function to get a random swim speed
+    this.laziness = 0.95;//stop at target timer
+    this.isMoving = true;
 
     this.state = 'swimming'; // Initial state for the fish
     
@@ -150,17 +153,21 @@ biteOn() {
       this.sprite.setScale(1, 1); // Resets the flip when moving right
     }
   }
-/////////////////////////////////FISH UPDATE SECTION///////////////////////////////////////
+/////////////////////////////////FISH UPDATE SECTION/////////////////////////////////////////////////
 updateFish() {
   if (this.state === 'swimming') {
-    let speed = 1;
-    this.moveTowardsTarget(this.movementTarget, speed);
+    let speed = this.swimSpeed;
 
     // Check if the target has been reached
     if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
       // If so, generate a new target
-      this.movementTarget = this.generateNewTarget();
+      this.reachedDestination();//sometimes pauses the fish sometimes moved to new target
     }
+    if (this.isMoving) {
+      this.moveTowardsTarget(this.movementTarget, speed);
+    }
+
+
   }
 
   if (this.state === 'baited') {
@@ -172,13 +179,29 @@ updateFish() {
     // Check if close to target
     if (Math.abs(this.sprite.x - this.movementTarget.x) < speed && Math.abs(this.sprite.y - this.movementTarget.y) < speed) {
       // DO SOMETHING?
-    } else {
+    } 
+    else {
       this.moveTowardsTarget(this.movementTarget, speed);
     }
   }
 }
+reachedDestination() {
+  let randomValue = Math.random(); // Generates a random number between 0 and 1
 
+  if (randomValue >= this.laziness) {
+    console.log("new movement target");
+    this.movementTarget = this.generateNewTarget();
+    this.isMoving = true; // The fish should move to the new target
+  } else {
+    console.log("does nothing");
+    this.isMoving = false; // The fish should not move
+  }
+}
 getPosition() {
   return { x: this.sprite.x, y: this.sprite.y };
 }
+}
+
+function getRandomSwimSpeed(min = 0.3, max = 1) {
+  return Math.random() * (max - min) + min;
 }
