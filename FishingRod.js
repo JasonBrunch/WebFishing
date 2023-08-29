@@ -129,10 +129,14 @@ function castLine(sceneContext, power) {
     
 
 }
-
+//CURENT METHOD FOR REELING THE LINE
   function testReelLine(sceneContext) {
         if (sceneContext.isLineCast) {
             let reelSpeed = 5; // Speed at which the line reels in
+            //SPIN THE BUTTON
+            sceneContext.reelBtnShape.angle -= reelSpeed;
+
+
             let startX = rod.x + rod.width + rodOffsetX;
             let startY = rod.y - rod.height + rodOffsetY;
     
@@ -167,14 +171,9 @@ function reelLine(sceneContext) {
 
             //CHECK IF FISH IS CAUGHT and trigger a function with the following:
             if(currentFishHooked != null){
-                
-            //show the fish caught screen
-            showFishCaughtScreen(sceneContext, currentFishHooked);
-            
+                showFishCaughtScreen(sceneContext, currentFishHooked);            
             }
             
-
-
             //set state of fish back to swimming
             sceneContext.fishManager.resetFish();
             // Remove the line graphics by destroying the object
@@ -191,12 +190,9 @@ function reelLine(sceneContext) {
             sceneContext.isLineCast = false;
             sceneContext.isCastable = true;
             currentFishHooked = null;
-            
-            
         }
     }
-  
-    }
+}
     
     
     

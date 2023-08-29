@@ -9,11 +9,6 @@ body, html {
     width: 100%;
     height: 100vh; /* Sets the height to 100% of the viewport height */
 }
-#roundButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1; /* Ensures the button appears above the Phaser canvas */
-}
+
 
 

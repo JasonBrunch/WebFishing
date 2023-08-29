@@ -3,6 +3,9 @@ let rod;
 const gameContainer = document.getElementById('game-area');
 let backgroundMusic;
 let isMusicPlaying = false; 
+let initialYValue = gameContainer.offsetHeight * 0.4;//water height drawn size intially
+let sliderY = 100;
+let sliderX = 150;
 
 const config = {
     type: Phaser.AUTO,
@@ -24,6 +27,7 @@ function preload() {
   this.load.image('guyInBoat', 'GuyInABoat.png');
   this.load.image('soundBtnSprite','SoundBtnSprite.png');
   this.load.image('ReelBtnSprite','ReelBtn.png');
+  this.load.image('castBtnSprite','castBtn.png');
 
   //LOAD MUSIC FILE HERE:
   this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
@@ -43,11 +47,12 @@ function create() {
   
   //new test reel button
   //const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
-  const reelBtnShape = this.add.sprite(200, 100, 'ReelBtnSprite');
-  reelBtnShape.setInteractive();
+  this.reelBtnShape = this.add.sprite(sliderX, sliderY, 'ReelBtnSprite');
+this.reelBtnShape.setInteractive();
+this.reelBtnShape.setVisible(false);
 
-  reelBtnShape.on('pointerdown', () => this.isReeling = true);
-  reelBtnShape.on('pointerup', () => this.isReeling = false);
+this.reelBtnShape.on('pointerdown', () => this.isReeling = true);
+this.reelBtnShape.on('pointerup', () => this.isReeling = false);
 
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
@@ -67,12 +72,13 @@ function create() {
   };
 
   const musicOnButton = this.add.sprite(gameContainer.offsetWidth - 30, 40, 'soundBtnSprite'); // Adjust 50 based on the size of your sprite
-musicOnButton.setInteractive();
-musicOnButton.on('pointerdown', musicToggle);
+  musicOnButton.setInteractive();
+  musicOnButton.on('pointerdown', musicToggle);
   
 
   //Create water
-  this.water = createWater(this, gameContainer);
+  this.water = createWater(this, gameContainer, initialYValue);
+
   //Fish animation
   createFishAnimation(this);
   // Create an instance of the FishManager
@@ -80,9 +86,6 @@ musicOnButton.on('pointerdown', musicToggle);
   // Create some fish using the FishManager
   this.fishManager.createFish(10);
   // Add the boat guy first (using a temporary y-coordinate)
-  
-
-  
   
   let boatGuy = this.add.sprite(125, 125, 'guyInBoat');
   // Determine the y-coordinate for the boat guy, considering the sprite's height
@@ -123,14 +126,12 @@ const game = new Phaser.Game(config);
 /////////////////////////FUNCTIONS SECTION ///////////////////////////////////
 //Casting Slider Logic
 function createSlider() {
-  let sliderY = 20;
-  let sliderX = 200;
   let sliderWidth = 200;
   let sliderBackground = this.add.rectangle(sliderX, sliderY, sliderWidth, 10, 0x000000);
   let slideAmount = 0;
 
   // Position the knob at the right end of the slider
-  this.sliderKnob = this.add.rectangle(sliderX + (sliderWidth / 2), sliderY, 20, 20, 0xFF0000);
+  this.sliderKnob = this.add.sprite(sliderX + (sliderWidth / 2), sliderY, 'castBtnSprite');
   this.sliderKnob.setInteractive();
   this.input.setDraggable(this.sliderKnob);
 
@@ -160,9 +161,15 @@ function createSlider() {
       //set isCastable to false
       this.isCastable = false;
       this.isLineCast = true;
+      this.reelBtnShape.setVisible(true);
+      sliderBackground.setVisible(false);
+      this.sliderKnob.setVisible(false);
       
       slideAmount = 0;
       rod.setAngle(0);
+      this.reelBtnShape.setPosition(this.sliderKnob.x, this.sliderKnob.y);
+
+    
     }
   });
 }
@@ -175,17 +182,19 @@ function createButton(scene, x, y, width, height, text) {
   const buttonText = scene.add.text(x + width / 4, y + height / 4, text, { color: '#ffffff' });
   return buttonShape;
 }
-function createWater(scene, gameContainer) {
+function createWater(scene, gameContainer, yValue) {
   const water = {
     graphics: scene.add.graphics(),
     x: 0,
-    y: gameContainer.offsetHeight * 0.30,
+    y: yValue || gameContainer.offsetHeight * 0.30, // use provided yValue or default
     width: gameContainer.offsetWidth,
     height: gameContainer.offsetHeight * 0.70,
     fillColor: 0x0000FF,
-    
-    
+
     draw(scene) {
+      // Remove any existing water image before drawing new one
+      if (this.waterImage) this.waterImage.destroy();
+      
       // Create a canvas element
       var gradientCanvas = document.createElement('canvas');
       gradientCanvas.width = this.width;
@@ -209,10 +218,14 @@ function createWater(scene, gameContainer) {
       gradientTexture.refresh();
     
       // Draw the texture using an image object (instead of a Graphics object)
-      scene.add.image(this.x, this.y, 'waterGradient').setOrigin(0, 0);
+      this.waterImage = scene.add.image(this.x, this.y, 'waterGradient').setOrigin(0, 0);
     },
     contains(x, y) {
       return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
+    },
+    updateY(newY) {
+      this.y = newY;
+      this.draw(scene); // Redraw the water
     }
   };
   water.draw(scene); // draw the water initially
