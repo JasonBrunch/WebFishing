@@ -48,11 +48,11 @@ function create() {
   //new test reel button
   //const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
   this.reelBtnShape = this.add.sprite(sliderX, sliderY, 'ReelBtnSprite');
-this.reelBtnShape.setInteractive();
-this.reelBtnShape.setVisible(false);
+  this.reelBtnShape.setInteractive();
+  this.reelBtnShape.setVisible(false);
 
-this.reelBtnShape.on('pointerdown', () => this.isReeling = true);
-this.reelBtnShape.on('pointerup', () => this.isReeling = false);
+  this.reelBtnShape.on('pointerdown', () => this.isReeling = true);
+  this.reelBtnShape.on('pointerup', () => this.isReeling = false);
 
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
@@ -105,9 +105,6 @@ this.reelBtnShape.on('pointerup', () => this.isReeling = false);
   createSlider.call(this);
 
   this.bubbles = createBubbles(this, this.water);
-
-
-  
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////
@@ -127,7 +124,7 @@ const game = new Phaser.Game(config);
 //Casting Slider Logic
 function createSlider() {
   let sliderWidth = 200;
-  let sliderBackground = this.add.rectangle(sliderX, sliderY, sliderWidth, 10, 0x000000);
+  this.sliderBackground = this.add.rectangle(sliderX, sliderY, sliderWidth, 10, 0x000000);
   let slideAmount = 0;
 
   // Position the knob at the right end of the slider
@@ -162,7 +159,7 @@ function createSlider() {
       this.isCastable = false;
       this.isLineCast = true;
       this.reelBtnShape.setVisible(true);
-      sliderBackground.setVisible(false);
+      this.sliderBackground.setVisible(false);
       this.sliderKnob.setVisible(false);
       
       slideAmount = 0;
@@ -274,33 +271,32 @@ function testButtonFunction(fishmanager, scene){
 
 
 function createBackground(scene, gameContainer) {
-  // Create a canvas element
-  var gradientCanvas = document.createElement('canvas');
-  gradientCanvas.width = gameContainer.offsetWidth;
-  gradientCanvas.height = gameContainer.offsetHeight;
-
-  // Get the canvas rendering context
-  var ctx = gradientCanvas.getContext('2d');
-
-  // Create a linear gradient (from top to bottom)
-  var gradient = ctx.createLinearGradient(0, 0, 0, gradientCanvas.height);
-  gradient.addColorStop(0, '#000044'); // Top color (dark blue)
-  gradient.addColorStop(1, '#FFC0CB'); // Bottom color (light pink)
-
-  // Apply the gradient to the entire canvas
+  // Create a canvas element for gradient
+  var gradientCanvas = scene.textures.createCanvas('backgroundGradient', gameContainer.offsetWidth, gameContainer.offsetHeight);
+  var ctx = gradientCanvas.context;
+  
+  // Create radial gradient
+  const centerX = gameContainer.offsetWidth / 2;
+  const centerY = gameContainer.offsetHeight / 2;
+  const radius = Math.sqrt(centerX * centerX + centerY * centerY);
+  var gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+  gradient.addColorStop(0, '#FFC0CB');
+  gradient.addColorStop(1, '#000044');
+  
+  // Draw gradient on canvas
   ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
+  ctx.fillRect(0, 0, gameContainer.offsetWidth, gameContainer.offsetHeight);
+  
+  // Refresh the texture so the drawn gradient gets reflected
+  gradientCanvas.refresh();
+  
+// Add the sun using Phaser
+//let sun = scene.add.circle(centerX, centerY, 50, 0xFFFF00, 1);
+//sun.setDepth(1); // Higher value means it will be rendered on top
 
-  // Create a Phaser texture from the canvas
-  var gradientTexture = scene.textures.createCanvas('backgroundGradient', gradientCanvas.width, gradientCanvas.height);
-  gradientTexture.context.drawImage(gradientCanvas, 0, 0);
-  gradientTexture.refresh();
-
-  // Draw the texture using an image object
-  scene.add.image(0, 0, 'backgroundGradient').setOrigin(0, 0);
-}
-function soundButton() {
-  console.log("click");
+// Add the gradient background image
+let bg = scene.add.image(0, 0, 'backgroundGradient').setOrigin(0, 0);
+bg.setDepth(0); // Lower value means it will be rendered below
 }
 
 

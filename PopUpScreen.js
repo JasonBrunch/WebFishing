@@ -1,21 +1,22 @@
 function showFishCaughtScreen(scene, fish) {
-  // Create a background rectangle
+  // Create a background rectangle with a border
   const bgRect = scene.add.rectangle(scene.cameras.main.centerX, scene.cameras.main.centerY, 400, 300, 0xFFFFFF);
+  bgRect.setStrokeStyle(4, 0x000000); // Add border: 4px width, black color
 
   // Create a new sprite using the fish's texture key
   const fishSprite = scene.add.sprite(scene.cameras.main.centerX, scene.cameras.main.centerY, fish.sprite.texture.key);
 
   // Create text for the "Fish Caught" title
-  const titleText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 70, 'Fish Caught', { fontSize: '24px', align: 'center', fill: '#000' });
+  const titleText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 100, 'Fish Caught', { fontSize: '24px', align: 'center', fill: '#000' }); // Raised Y-coordinate
   titleText.setOrigin(0.5, 0.5);
 
   // Display fish stats
-  const statsText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 30, `Size: 10.2`, { fontSize: '18px', align: 'center', fill: '#000' });
+  const statsText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 60, `Size: 10.2`, { fontSize: '18px', align: 'center', fill: '#000' }); // Raised Y-coordinate
   statsText.setOrigin(0.5, 0.5);
 
   // Create a close button
   const closeButton = createRectangleButton(scene, scene.cameras.main.centerX, scene.cameras.main.centerY + 100, 150, 50, 'Close');
-  
+
   closeButton.on('pointerdown', () => {
     bgRect.destroy();
     titleText.destroy();

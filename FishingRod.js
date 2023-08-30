@@ -190,6 +190,12 @@ function reelLine(sceneContext) {
             sceneContext.isLineCast = false;
             sceneContext.isCastable = true;
             currentFishHooked = null;
+
+            //reset the casting buttons
+            sceneContext.reelBtnShape.setVisible(false);
+            sceneContext.sliderKnob.setVisible(true);
+            sceneContext.sliderBackground.setVisible(true);
+           
         }
     }
 }
