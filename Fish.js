@@ -189,11 +189,11 @@ reachedDestination() {
   let randomValue = Math.random(); // Generates a random number between 0 and 1
 
   if (randomValue >= this.laziness) {
-    console.log("new movement target");
+    //console.log("new movement target");
     this.movementTarget = this.generateNewTarget();
     this.isMoving = true; // The fish should move to the new target
   } else {
-    console.log("does nothing");
+    //console.log("does nothing");
     this.isMoving = false; // The fish should not move
   }
 }

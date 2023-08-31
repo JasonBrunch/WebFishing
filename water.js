@@ -1,4 +1,8 @@
 function createWater(scene, gameContainer, yValue, sunCenterX, sunCenterY) {
+    const numVertices = 100; // Number of points along the surface
+    const amplitude = 5; // Height of the waves
+    const frequency = 0.11; // How fast the wave moves
+        
     const water = {
       graphics: scene.add.graphics(),
       x: 0,
@@ -6,36 +10,42 @@ function createWater(scene, gameContainer, yValue, sunCenterX, sunCenterY) {
       width: gameContainer.offsetWidth,
       height: gameContainer.offsetHeight - backgroundYValue,
       fillColor: 0x0000FF,
-  
-      draw(scene, sunCenterX, sunCenterY) {
-        // Remove any existing water image before drawing new one
-        if (this.waterImage) this.waterImage.destroy();
-        
-        // Create a canvas element
-        var gradientCanvas = document.createElement('canvas');
-        gradientCanvas.width = this.width;
-        gradientCanvas.height = this.height;
-      
-        // Get the canvas rendering context
-        var ctx = gradientCanvas.getContext('2d');
-      
-        // Create a radial gradient (from the sun position)
-        var gradient = ctx.createRadialGradient(sunCenterX, sunCenterY - backgroundYValue, 0, sunCenterX, sunCenterY - backgroundYValue, Math.sqrt(this.width * this.width + this.height * this.height));
-        gradient.addColorStop(0, '#0099FF'); // Near the sun
-        gradient.addColorStop(1, '#000066'); // Far from the sun
-      
-        // Apply the gradient to the entire canvas
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, this.width, this.height);
-      
-        // Create a Phaser texture from the canvas
-        var gradientTexture = scene.textures.createCanvas('waterGradient', this.width, this.height);
-        gradientTexture.context.drawImage(gradientCanvas, 0, 0);
-        gradientTexture.refresh();
-      
-        // Draw the texture using an image object (instead of a Graphics object)
-        this.waterImage = scene.add.image(this.x, this.y, 'waterGradient').setOrigin(0, 0);
+
+      surfaceVertices: Array.from({ length: numVertices }, (_, i) => i * (gameContainer.offsetWidth / (numVertices - 1))),
+      tick: 0,
+
+      updateSurface() {
+        console.log("updateSurfacing......");
+        this.tick += 0.02; // Adjust the value for speed
+        for (let i = 0; i < this.surfaceVertices.length; i++) {
+          const x = this.surfaceVertices[i];
+          this.surfaceVertices[i] = Math.sin(this.tick + x * frequency) * amplitude;
+        }
       },
+    
+      draw(scene, sunCenterX, sunCenterY) {
+        // Clear existing graphics
+        const graphics = this.graphics;
+        graphics.clear();
+        
+        // Update the graphics to draw the wave curve based on updated surfaceVertices
+        graphics.fillStyle(0x0000FF, 1);  // Set fill color to blue
+        graphics.beginPath();
+        graphics.moveTo(this.x, this.y); // Starting point
+    
+        // Draw the surface using surfaceVertices
+        for (let i = 0; i < this.surfaceVertices.length; i++) {
+            const x = this.x + i * (this.width / (this.surfaceVertices.length - 1));
+            const y = this.y + this.surfaceVertices[i];
+            graphics.lineTo(x, y);
+        }
+    
+        graphics.lineTo(this.x + this.width, this.y + this.height);
+        graphics.lineTo(this.x, this.y + this.height);
+        graphics.closePath();
+        graphics.fillPath();
+    },
+      
       contains(x, y) {
         return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
       },
@@ -43,7 +53,8 @@ function createWater(scene, gameContainer, yValue, sunCenterX, sunCenterY) {
         this.y = newY;
         this.draw(scene, sunCenterX, sunCenterY); // Redraw the water
       }
-    };
+    }
+    
     water.draw(scene, sunCenterX, sunCenterY); // draw the water initially
     return water;
   }

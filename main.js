@@ -21,6 +21,17 @@ const config = {
 };
 
 function preload() {
+
+  let loadingText = this.add.text(gameContainer.offsetWidth / 2, gameContainer.offsetHeight / 2, 'Loading...', { color: '#ffffff' });
+  loadingText.setOrigin(0.5, 0.5);
+
+  this.load.on('progress', (value) => {
+    loadingText.setText(`Loading... ${parseInt(value * 100)}%`);
+  });
+
+  this.load.on('complete', () => {
+    loadingText.destroy();
+  });
   // Load assets
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
@@ -56,7 +67,7 @@ function create() {
 
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
-    testButtonFunction(this.fishManager, this);
+  testButtonFunction(this.fishManager, this);
   });
   backgroundMusic = this.sound.add('backgroundMusic',{loop: true});
 
@@ -112,6 +123,8 @@ function update(delta) {
   }
   this.fishManager.activateFish(delta); // Existing code
   updateBubbles(this.bubbles, this.water);
+  this.water.updateSurface();
+  this.water.draw(this, sunCenterX, sunCenterY);
 }
 
 const game = new Phaser.Game(config);
