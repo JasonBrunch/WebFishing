@@ -10,21 +10,36 @@ function showFishCaughtScreen(scene, fish) {
   const titleText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 100, 'Fish Caught', { fontSize: '24px', align: 'center', fill: '#000' }); // Raised Y-coordinate
   titleText.setOrigin(0.5, 0.5);
 
+  const nameText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 75, fish.fishType, { fontSize: '18px', align: 'center', fill: '#000' }); // Raised Y-coordinate
+  nameText.setOrigin(0.5, 0.5);
   // Display fish stats
-  const statsText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 60, `Size: 10.2`, { fontSize: '18px', align: 'center', fill: '#000' }); // Raised Y-coordinate
+  const statsText = scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 50, `Weight: ` + fish.weight + 'lbs', { fontSize: '18px', align: 'center', fill: '#000' }); // Raised Y-coordinate
   statsText.setOrigin(0.5, 0.5);
 
   // Create a close button
   const closeButton = createRectangleButton(scene, scene.cameras.main.centerX, scene.cameras.main.centerY + 100, 150, 50, 'Close');
-
+  const fishWorth = setFishWorth(fish.weight);
   closeButton.on('pointerdown', () => {
     bgRect.destroy();
     titleText.destroy();
     statsText.destroy();
+    nameText.destroy();
     fishSprite.destroy(); // Destroy the fish sprite
     closeButton.text.destroy(); // Destroy the button text
     closeButton.destroy();
+
+    //update the score
+    updateScore(fishWorth, scene);
   });
+}
+function setFishWorth(weight) {
+  const roundedWeight = Math.ceil(weight);  // Rounds up to the nearest whole number
+  const fishWorth = roundedWeight * 1;  // Here, each weight unit is worth $1
+  return fishWorth;
+}
+function updateScore(fishWorth, scene) {  // Pass scene as an argument
+  playerScore += fishWorth;
+  scene.scoreText.setText(`Score: $${playerScore}`);  // Use scene.scoreText
 }
   
 function createRectangleButton(scene, x, y, width, height, text) {

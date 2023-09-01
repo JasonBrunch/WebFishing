@@ -7,6 +7,7 @@ let initialYValue = gameContainer.offsetHeight * 0.6; // existing code
 let backgroundYValue = gameContainer.offsetHeight * 0.4; // new code
 let sliderY = 100;
 let sliderX = 150;
+let playerScore = 0;
 
 const config = {
     type: Phaser.AUTO,
@@ -114,6 +115,8 @@ function create() {
   createSlider.call(this);
 
   this.bubbles = createBubbles(this, this.water);
+
+  this.scoreText = this.add.text(gameContainer.offsetWidth - 250, 10, `Score: ${playerScore}`, { fontSize: '32px', fill: '#fff' });
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////

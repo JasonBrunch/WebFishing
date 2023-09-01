@@ -5,13 +5,16 @@ class Fish {
     this.swimSpeed = getRandomSwimSpeed(); // Calls the function to get a random swim speed
     this.laziness = 0.95;//stop at target timer
     this.isMoving = true;
-
+    this.weight = this.getRandomWeight();
+    this.sprite = this.scene.add.sprite(x, y, texture, 0);
+    this.setUpSize(this.weight);
     this.state = 'swimming'; // Initial state for the fish
+    this.fishType = 'Angler';
     
     this.biteDistance = 10; // Distance for biting
 
     // Creating the sprite and storing it in the instance
-    this.sprite = this.scene.add.sprite(x, y, texture, 0);
+    
 
     this.depth = Math.random(); // Value between 0 (far) and 1 (near)
     // Apply a random opacity between 0.5 and 1
@@ -23,12 +26,27 @@ class Fish {
     // Set an initial target for the fish
     this.movementTarget = this.generateNewTarget();
   }
-
+  getRandomWeight(min = 1, max = 10) {
+    let weight = Math.random() * (max - min) + min;
+    weight = parseFloat(weight.toFixed(1));
+    return weight
+  }
+  setUpSize(weight){
+    // Normalize the weight to a range of [0.5, 1.5]
+    let scale = 0.5 + (weight / 10);
+  
+    // Apply the scale to the sprite
+    this.sprite.setScale(scale, scale);
+  }
 
   // Generates a new random target within the water boundaries
   generateNewTarget() {
-    // Generate a new target x-coordinate within the water boundaries
-    let targetX = this.water.x + Math.random() * this.water.width;
+    // Create a buffer of 200 pixels (or whatever you feel appropriate) on both sides
+    let buffer = 500;
+  
+    // Now, the fish can have a target between water.x - buffer to water.x + water.width + buffer
+    let targetX = this.water.x + Math.random() * (this.water.width + 2 * buffer) - buffer;
+
   
     // Determine the range for y-coordinate (e.g., 10% of fish sprite's height)
     let yRange = this.sprite.height;
@@ -133,26 +151,29 @@ biteOn() {
 
 ////////////////////////////////SWIMMING SECTION/////////////////////////////
 
-  moveTowardsTarget(target, speed) {
-    let directionX = target.x - this.sprite.x;
-    let directionY = target.y - this.sprite.y;
+moveTowardsTarget(target, speed) {
+  let directionX = target.x - this.sprite.x;
+  let directionY = target.y - this.sprite.y;
 
-    // Normalize the direction
-    let magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
-    directionX /= magnitude;
-    directionY /= magnitude;
+  // Normalize the direction
+  let magnitude = Math.sqrt(directionX * directionX + directionY * directionY);
+  directionX /= magnitude;
+  directionY /= magnitude;
 
-    // Update the sprite's position
-    this.sprite.x += directionX * speed;
-    this.sprite.y += directionY * speed;
+  // Calculate the scale based on weight
+  let scale = 0.5 + (this.weight / 10);
+  
+  // Update the sprite's position
+  this.sprite.x += directionX * speed;
+  this.sprite.y += directionY * speed;
 
-    // Flip the sprite if it's moving to the left
-    if (directionX < 0) {
-      this.sprite.setScale(-1, 1); // Flips the sprite horizontally
-    } else {
-      this.sprite.setScale(1, 1); // Resets the flip when moving right
-    }
+  // Flip the sprite if it's moving to the left
+  if (directionX < 0) {
+    this.sprite.setScale(-scale, scale); // Flips the sprite horizontally
+  } else {
+    this.sprite.setScale(scale, scale); // Resets the flip when moving right
   }
+}
 /////////////////////////////////FISH UPDATE SECTION/////////////////////////////////////////////////
 updateFish() {
   if (this.state === 'swimming') {

@@ -15,7 +15,7 @@ function createWater(scene, gameContainer, yValue, sunCenterX, sunCenterY) {
       tick: 0,
 
       updateSurface() {
-        console.log("updateSurfacing......");
+       
         this.tick += 0.02; // Adjust the value for speed
         for (let i = 0; i < this.surfaceVertices.length; i++) {
           const x = this.surfaceVertices[i];
