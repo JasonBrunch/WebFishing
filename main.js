@@ -92,7 +92,17 @@ function create() {
   
   
   // Add the boat guy first (using a temporary y-coordinate)
-  let guyInBoat = this.add.sprite(300,125,'guySprite');
+  let guyInBoat = this.add.sprite(250,125,'guySprite');
+  
+  // Determine where the rod's origin should be, relative to the boat guy
+  let rodOffsetX = 0; // Example value, adjust as needed
+  let rodOffsetY = 140; // Example value, adjust as needed
+  let rodX = guyInBoat.x + rodOffsetX;
+  let rodY = guyInBoat.y + rodOffsetY;
+
+  rod = this.add.sprite(rodX,rodY,'fishingRod');
+  rod.setOrigin(0, 1); // Set the origin to the bottom-left corner
+  
   let boatSprite = this.add.sprite(300, 125, 'woodenBoatSprite');
   
   
@@ -116,19 +126,13 @@ function create() {
 
   // Update the boat guy's y-coordinate to the correct value
   boatSprite.setY(boatY);
-  guyInBoat.setY(boatY);
+
+  guyInBoat.setY(boatY - 30);
   
 
   //put the guy in his boat
 
-  // Determine where the rod's origin should be, relative to the boat guy
-  let rodOffsetX = -30; // Example value, adjust as needed
-  let rodOffsetY = 10; // Example value, adjust as needed
-  let rodX = boatSprite.x + rodOffsetX;
-  let rodY = boatSprite.y + rodOffsetY;
-
-  rod = this.add.sprite(rodX,rodY,'fishingRod');
-  rod.setOrigin(0, 1); // Set the origin to the bottom-left corner
+  
   
   createSlider.call(this);
 
