@@ -37,10 +37,12 @@ function preload() {
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
-  this.load.image('guyInBoat', 'GuyInABoat.png');
   this.load.image('soundBtnSprite','SoundBtnSprite.png');
   this.load.image('ReelBtnSprite','ReelBtn.png');
   this.load.image('castBtnSprite','castBtn.png');
+  this.load.image('woodenBoatSprite', 'WoodenBoat.png');
+  this.load.image('guySprite','Guy.png');
+
 
   //LOAD MUSIC FILE HERE:
   this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
@@ -56,6 +58,7 @@ function create() {
   this.isFishOn = false;
   this.isReeling = false;
   createBackground(this, gameContainer);
+  
   
   //new test reel button
   //const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
@@ -86,6 +89,14 @@ function create() {
   const musicOnButton = this.add.sprite(gameContainer.offsetWidth - 30, 40, 'soundBtnSprite'); // Adjust 50 based on the size of your sprite
   musicOnButton.setInteractive();
   musicOnButton.on('pointerdown', musicToggle);
+  
+  
+  // Add the boat guy first (using a temporary y-coordinate)
+  let guyInBoat = this.add.sprite(300,125,'guySprite');
+  let boatSprite = this.add.sprite(300, 125, 'woodenBoatSprite');
+  
+  
+  
   //Create water
   this.water = createWater(this, gameContainer, initialYValue, sunCenterX, sunCenterY);
 
@@ -95,19 +106,26 @@ function create() {
   this.fishManager = new FishManager(this, this.water);
   // Create some fish using the FishManager
   this.fishManager.createFish(10);
-  // Add the boat guy first (using a temporary y-coordinate)
   
-  let boatGuy = this.add.sprite(125, 125, 'guyInBoat');
+
+
+
+
   // Determine the y-coordinate for the boat guy, considering the sprite's height
-  let boatGuyY = this.water.y - boatGuy.height / 2; // Assuming the anchor point is at the center of the sprite
+  let boatY = this.water.y; // Assuming the anchor point is at the center of the sprite
+
   // Update the boat guy's y-coordinate to the correct value
-  boatGuy.setY(boatGuyY);
+  boatSprite.setY(boatY);
+  guyInBoat.setY(boatY);
+  
+
+  //put the guy in his boat
 
   // Determine where the rod's origin should be, relative to the boat guy
   let rodOffsetX = -30; // Example value, adjust as needed
   let rodOffsetY = 10; // Example value, adjust as needed
-  let rodX = boatGuy.x + rodOffsetX;
-  let rodY = boatGuy.y + rodOffsetY;
+  let rodX = boatSprite.x + rodOffsetX;
+  let rodY = boatSprite.y + rodOffsetY;
 
   rod = this.add.sprite(rodX,rodY,'fishingRod');
   rod.setOrigin(0, 1); // Set the origin to the bottom-left corner
