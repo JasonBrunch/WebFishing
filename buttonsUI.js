@@ -35,13 +35,13 @@ function createSlider() {
         //set isCastable to false
         this.isCastable = false;
         this.isLineCast = true;
-        this.reelBtnShape.setVisible(true);
+        this.reelBtn.setVisible(true);
         this.sliderBackground.setVisible(false);
         this.sliderKnob.setVisible(false);
         
         slideAmount = 0;
         rod.setAngle(0);
-        this.reelBtnShape.setPosition(this.sliderKnob.x, this.sliderKnob.y);
+        this.reelBtn.setPosition(this.sliderKnob.x, this.sliderKnob.y);
   
       
       }
@@ -56,9 +56,62 @@ function createSlider() {
     const buttonText = scene.add.text(x + width / 4, y + height / 4, text, { color: '#ffffff' });
     return buttonShape;
   }
+  function createReelBtn(scene){
+    let reelBtnShape = scene.add.sprite(sliderX, sliderY, 'ReelBtnSprite');
+    reelBtnShape.setInteractive();
+    reelBtnShape.setVisible(false);
+  
+    reelBtnShape.on('pointerdown', () => scene.isReeling = true);
+    reelBtnShape.on('pointerup', () => scene.isReeling = false);
 
-  function testButtonFunction(fishmanager, scene){
+    return reelBtnShape;
+  }
+
+  function TestFishCaughtScreen(fishmanager, scene){
     let testicleFish = fishmanager.createOneFish();
     showFishCaughtScreen(scene, testicleFish);
+
+  }
+  const musicToggle = () => {
+    if (isMusicPlaying) {
+      backgroundMusic.stop(); // Turn off music
+      console.log("turned off music");
+    } else {
+      backgroundMusic.play(); // Play music
+      console.log("Music turned On");
+    }
+    isMusicPlaying = !isMusicPlaying; // Toggle the state
+  };
+  
+  function createMusicBtnFunction(scene){
+    const musicButton = scene.add.sprite(gameContainer.offsetWidth - 35, 60, 'musicBtnSpriteSheet');
+
+    musicButton.setScale(0.5);
+  
+    // Initialize with the correct frame depending on whether music is playing
+    musicButton.setFrame(isMusicPlaying ? 2 : 0);
+    
+    musicButton.setInteractive();
+  
+    // Pointer Hover In
+    musicButton.on('pointerover', () => {
+      const hoverFrame = isMusicPlaying ? 3 : 1;
+      musicButton.setFrame(hoverFrame);
+    });
+  
+    // Pointer Hover Out
+    musicButton.on('pointerout', () => {
+      const baseFrame = isMusicPlaying ? 2 : 0;
+      musicButton.setFrame(baseFrame);
+    });
+  
+    // Pointer Down
+    musicButton.on('pointerdown', () => {
+      musicToggle(); // Your existing function to toggle music
+      const baseFrame = isMusicPlaying ? 2 : 0; // isMusicPlaying will be toggled in musicToggle
+      musicButton.setFrame(baseFrame);
+    });
+  
+    return musicButton;
   }
   

@@ -1,4 +1,3 @@
-//global variables
 let rod;
 const gameContainer = document.getElementById('game-area');
 let backgroundMusic;
@@ -22,123 +21,71 @@ const config = {
 };
 
 function preload() {
-
+  //LOADING SCREEN
   let loadingText = this.add.text(gameContainer.offsetWidth / 2, gameContainer.offsetHeight / 2, 'Loading...', { color: '#ffffff' });
   loadingText.setOrigin(0.5, 0.5);
-
   this.load.on('progress', (value) => {
     loadingText.setText(`Loading... ${parseInt(value * 100)}%`);
   });
-
   this.load.on('complete', () => {
     loadingText.destroy();
   });
-  // Load assets
+  //LOAD SPRITES
   this.load.spritesheet('fish', 'FishSpriteSheetTest.png', { frameWidth: 64, frameHeight: 64 });
   this.load.spritesheet('hooks','HookSpriteSheet.png',{frameWidth: 64, frameHeight: 64});
+  this.load.spritesheet('musicBtnSpriteSheet','MusicBtns.png',{frameWidth: 64, frameHeight: 64});
   this.load.image('fishingRod','FishingRod.png');
-  this.load.image('soundBtnSprite','SoundBtnSprite.png');
+  //this.load.image('soundBtnSprite','SoundBtnSprite.png');
   this.load.image('ReelBtnSprite','ReelBtn.png');
   this.load.image('castBtnSprite','castBtn.png');
   this.load.image('woodenBoatSprite', 'WoodenBoat.png');
   this.load.image('guySprite','Guy.png');
-
-
-  //LOAD MUSIC FILE HERE:
+  //LOAD MUSIC 
   this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
 }
 
-
 //////////////////////////CREATE FUNCTION/////////////////////////////
-// Create objects, initialize variables, set up the game world
 function create() {
-  //initialize variables
+  //SCENE VARIABLES
   this.isLineCast = false;
   this.isCastable = true;
   this.isFishOn = false;
   this.isReeling = false;
+
   createBackground(this, gameContainer);
+  this.reelBtn = createReelBtn(this);
+  backgroundMusic = this.sound.add('backgroundMusic',{loop: true});
+  const createMusicBtn = createMusicBtnFunction(this);
+
+  let guyInBoat = this.add.sprite(250,125,'guySprite');//temporary Y coordinates, changes later
+  rod = createFishingRod(this, guyInBoat);
+  let boatSprite = this.add.sprite(300, 140, 'woodenBoatSprite');
+  this.water = createWater(this, gameContainer, initialYValue, sunCenterX, sunCenterY);
+
+  createFishAnimation(this);
+
+  this.fishManager = new FishManager(this, this.water);
+  this.fishManager.createFish(10);
+  
+  //SET UP THE BOAT GUYS POSITION RELATIVE TO THE WATER
+  let boatY = this.water.y - 10; // Assuming the anchor point is at the center of the sprite
+  boatSprite.setY(boatY);
+  guyInBoat.setY(boatY - 30);
+  
+  createSlider.call(this);
+  this.bubbles = createBubbles(this, this.water);
+  
+  this.scoreText = this.add.text(gameContainer.offsetWidth - 180, 10, `Score: ${playerScore}`, { fontSize: '32px', fill: '#fff' });
   
   
-  //new test reel button
-  //const reelButtonShape = createButton(this, 600, 10, 150, 50, 'Reel');
-  this.reelBtnShape = this.add.sprite(sliderX, sliderY, 'ReelBtnSprite');
-  this.reelBtnShape.setInteractive();
-  this.reelBtnShape.setVisible(false);
-
-  this.reelBtnShape.on('pointerdown', () => this.isReeling = true);
-  this.reelBtnShape.on('pointerup', () => this.isReeling = false);
-
+  
+  
+  
+  //TEST FOR THE FISH CAUGHT SCREEN - DELETE LATER
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
   testButtonFunction(this.fishManager, this);
   });
-  backgroundMusic = this.sound.add('backgroundMusic',{loop: true});
-
-  const musicToggle = () => {
-    if (isMusicPlaying) {
-      backgroundMusic.stop(); // Turn off music
-      console.log("turned off music");
-    } else {
-      backgroundMusic.play(); // Play music
-      console.log("Music turned On");
-    }
-    isMusicPlaying = !isMusicPlaying; // Toggle the state
-  };
-
-  const musicOnButton = this.add.sprite(gameContainer.offsetWidth - 30, 40, 'soundBtnSprite'); // Adjust 50 based on the size of your sprite
-  musicOnButton.setInteractive();
-  musicOnButton.on('pointerdown', musicToggle);
-  
-  
-  // Add the boat guy first (using a temporary y-coordinate)
-  let guyInBoat = this.add.sprite(250,125,'guySprite');
-  
-  // Determine where the rod's origin should be, relative to the boat guy
-  let rodOffsetX = 0; // Example value, adjust as needed
-  let rodOffsetY = 140; // Example value, adjust as needed
-  let rodX = guyInBoat.x + rodOffsetX;
-  let rodY = guyInBoat.y + rodOffsetY;
-
-  rod = this.add.sprite(rodX,rodY,'fishingRod');
-  rod.setOrigin(0, 1); // Set the origin to the bottom-left corner
-  
-  let boatSprite = this.add.sprite(300, 125, 'woodenBoatSprite');
-  
-  
-  
-  //Create water
-  this.water = createWater(this, gameContainer, initialYValue, sunCenterX, sunCenterY);
-
-  //Fish animation
-  createFishAnimation(this);
-  // Create an instance of the FishManager
-  this.fishManager = new FishManager(this, this.water);
-  // Create some fish using the FishManager
-  this.fishManager.createFish(10);
-  
-
-
-
-
-  // Determine the y-coordinate for the boat guy, considering the sprite's height
-  let boatY = this.water.y; // Assuming the anchor point is at the center of the sprite
-
-  // Update the boat guy's y-coordinate to the correct value
-  boatSprite.setY(boatY);
-
-  guyInBoat.setY(boatY - 30);
-  
-
-  //put the guy in his boat
-
-  
-  
-  createSlider.call(this);
-
-  this.bubbles = createBubbles(this, this.water);
-
-  this.scoreText = this.add.text(gameContainer.offsetWidth - 250, 10, `Score: ${playerScore}`, { fontSize: '32px', fill: '#fff' });
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////
@@ -153,6 +100,9 @@ function update(delta) {
 }
 
 const game = new Phaser.Game(config);
+
+
+
 
 /////////////////////////FUNCTIONS SECTION ///////////////////////////////////
 function createFishAnimation(scene) {

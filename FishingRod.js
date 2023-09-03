@@ -60,6 +60,34 @@ class Hook {
     
     // Other hook-related methods can be placed here
 }
+function createFishingRod(scene, guy){
+    // Determine where the rod's origin should be, relative to the boat guy
+    let rodOffsetX = 10; // Example value, adjust as needed
+    let rodOffsetY = 130; // Example value, adjust as needed
+    let rodX = guy.x + rodOffsetX;
+    let rodY = guy.y + rodOffsetY;
+    let fishingRod = scene.add.sprite(rodX,rodY,'fishingRod');
+    fishingRod.setOrigin(0, 1); // Set the origin to the bottom-left corner
+    return fishingRod;
+
+}
+
+  
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
 
 function createHook(sceneContext, x, y, texture) {
     let hook = new Hook(sceneContext, x, y, texture);
@@ -84,57 +112,61 @@ let rodOffsetX = 0;
 let rodOffsetY = 30; 
 
 function castLine(sceneContext, power) {
-   
-        let startX = rod.x + rod.width + rodOffsetX;
-        let startY = rod.y - rod.height + rodOffsetY;
+    let startX = rod.x + rod.width + rodOffsetX;
+    let startY = rod.y - rod.height + rodOffsetY;
 
-        let minX = startX; // Minimum x-coordinate is the starting x-coordinate
-        let maxX = gameContainer.offsetWidth * 0.9; // 90% of the screen width
+    let minX = startX; // Minimum x-coordinate is the starting x-coordinate
+    let maxX = gameContainer.offsetWidth * 0.9; // 90% of the screen width
 
-        // Map the power value (0 to 200) to the x-coordinate range (minX to maxX)
-        let endX = Phaser.Math.Linear(minX, maxX, power / 200);
-        let endY = game.scene.scenes[0].water.y; // Clamp to the water's surface
+    // Map the power value (0 to 200) to the x-coordinate range (minX to maxX)
+    let endX = Phaser.Math.Linear(minX, maxX, power / 200);
+    let endY = game.scene.scenes[0].water.y; // Clamp to the water's surface
 
-        // Depth of the line into the water, you can adjust this value
-        let depth = 250;
-        let endYDepth = endY + depth; // Adding depth to endY
+    // Depth of the line into the water, you can adjust this value
+    let depth = 250;
+    let endYDepth = endY + depth; // Adding depth to endY
 
-        // Draw a red circle at the starting point
-        //let startCircle = game.scene.scenes[0].add.circle(startX, startY, 5, 0xff0000);
+    // Create the bobber at the starting position
+    bobber = sceneContext.add.circle(startX, startY, 5, 0xff0000);
 
-        // Draw a red circle at the ending point, this can be used for the bobber
-        bobber = game.scene.scenes[0].add.circle(endX, endY, 5, 0xff0000);
+    // Initialize lineGraphics
+    lineGraphics = sceneContext.add.graphics();
+    lineGraphics.lineStyle(2, 0x000000);
 
-        // Draw a black line between the start and end points (horizontal casting line)
-        lineGraphics = game.scene.scenes[0].add.graphics();
-        lineGraphics.lineStyle(2, 0x000000);
-        lineGraphics.lineBetween(startX, startY, endX, endY);
-
-        // Draw a black line from the water's surface down to the depth (vertical line)
-        lineGraphics.lineBetween(endX, endY, endX, endYDepth);
-
-        // Create the hook sprite at the end of the line
-        let hookInfo = createHook(sceneContext, endX, endYDepth, 'hooks');
-    hookSprite = hookInfo.sprite;
-    hookPoint = hookInfo.hookPoint;
-    // Save bite point if you need it later
-    let bitePoint = hookInfo.bitePoint;
-
-
-    currentBait = wormBait;
-    if (currentBait) {
-        currentBait.updateLocation(hookSprite.x, hookSprite.y + hookSprite.height * 0.5);
-    }
-
-    
-
+    // Add the tween for bobber
+    sceneContext.tweens.add({
+        targets: bobber,
+        x: endX,
+        y: endY,
+        duration: 1000, // Adjust as needed
+        ease: 'Linear',
+        onUpdate: function () {
+            // Clear previous line and redraw
+            lineGraphics.clear();
+            lineGraphics.lineStyle(2, 0x000000);
+            lineGraphics.lineBetween(startX, startY, bobber.x, bobber.y);
+        },
+        onComplete: function() {
+            // Once the animation is complete, add your other code here.
+            // E.g., drawing the line into the water, adding hook and bait
+            lineGraphics.lineBetween(endX, endY, endX, endYDepth);
+            let hookInfo = createHook(sceneContext, endX, endYDepth, 'hooks');
+            hookSprite = hookInfo.sprite;
+            hookPoint = hookInfo.hookPoint;
+            let bitePoint = hookInfo.bitePoint;
+            currentBait = wormBait;
+            if (currentBait) {
+                currentBait.updateLocation(hookSprite.x, hookSprite.y + hookSprite.height * 0.5);
+            }
+        }
+    });
 }
 //CURENT METHOD FOR REELING THE LINE
   function testReelLine(sceneContext) {
         if (sceneContext.isLineCast) {
             let reelSpeed = 5; // Speed at which the line reels in
             //SPIN THE BUTTON
-            sceneContext.reelBtnShape.angle -= reelSpeed;
+            sceneContext.reelBtn.angle -= reelSpeed;
 
 
             let startX = rod.x + rod.width + rodOffsetX;
@@ -192,10 +224,12 @@ function reelLine(sceneContext) {
             currentFishHooked = null;
 
             //reset the casting buttons
-            sceneContext.reelBtnShape.setVisible(false);
+            sceneContext.reelBtn.setVisible(false);
             sceneContext.sliderKnob.setVisible(true);
             sceneContext.sliderBackground.setVisible(true);
            
+            sceneContext.isReeling = false;
+            
         }
     }
 }
