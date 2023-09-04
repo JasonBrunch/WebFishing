@@ -42,7 +42,7 @@ function preload() {
   this.load.image('guySprite','Guy.png');
   this.load.image('conversationBackground','conversationBubble.png');
   //LOAD MUSIC 
-  this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
+  this.load.audio('backgroundMusic',"The_Bubbling_Stream.mp3");
 }
 
 //////////////////////////CREATE FUNCTION/////////////////////////////
