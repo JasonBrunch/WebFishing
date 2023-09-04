@@ -25,7 +25,7 @@ function preload() {
   let loadingText = this.add.text(gameContainer.offsetWidth / 2, gameContainer.offsetHeight / 2, 'Loading...', { color: '#ffffff' });
   loadingText.setOrigin(0.5, 0.5);
   this.load.on('progress', (value) => {
-    loadingText.setText(`Loading... ${parseInt(value * 100)}%`);
+  loadingText.setText(`Loading... ${parseInt(value * 100)}%`);
   });
   this.load.on('complete', () => {
     loadingText.destroy();
@@ -40,6 +40,7 @@ function preload() {
   this.load.image('castBtnSprite','castBtn.png');
   this.load.image('woodenBoatSprite', 'WoodenBoat.png');
   this.load.image('guySprite','Guy.png');
+  this.load.image('conversationBackground','conversationBubble.png');
   //LOAD MUSIC 
   this.load.audio('backgroundMusic',"Alan Špiljak - On the edge of silence - Extended Mix.mp3");
 }
@@ -80,12 +81,14 @@ function create() {
   
   
   
-  
+  /*
   //TEST FOR THE FISH CAUGHT SCREEN - DELETE LATER
   const testicleButtonShape = createButton(this,400,0,50,50,'test');
   testicleButtonShape.on('pointerdown', () => {
-  testButtonFunction(this.fishManager, this);
-  });
+    testFishCaughtScreen(this.fishManager, this);
+     });
+    */
+ 
 }
 
 ////////////////////////////////UPDATE SECTION//////////////////////////////////

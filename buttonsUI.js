@@ -67,7 +67,7 @@ function createSlider() {
     return reelBtnShape;
   }
 
-  function TestFishCaughtScreen(fishmanager, scene){
+  function testFishCaughtScreen(fishmanager, scene){
     let testicleFish = fishmanager.createOneFish();
     showFishCaughtScreen(scene, testicleFish);
 
